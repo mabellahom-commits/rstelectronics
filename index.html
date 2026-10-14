@@ -4,14 +4,1935 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>RST ELECTRONICS — Enterprise Web ERP & Science Task Suite</title>
+<!-- Bootstrap 5, FontAwesome, Chart.js, HTML5 QR/Barcode, JsBarcode -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script>
-  // Redirect to assets or load standalone
-  window.location.href = "app/src/main/assets/web/index.html";
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Hind+Siliguri:wght@400;500;600;700&family=Cairo:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<style>
+:root{
+  --primary:#0f4c3a;--primary-light:#1e7e34;--accent:#ff6b00;--gold:#fbbf24;
+  --bg:#f8fafc;--dark:#0a291f;--text:#1e293b;--border:#e2e8f0;--radius:12px;
+  --shadow:0 4px 16px rgba(15,76,58,0.08);--shadow-lg:0 12px 36px rgba(15,76,58,0.14);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Plus Jakarta Sans','Hind Siliguri','Cairo',sans-serif;background:var(--bg);color:var(--text);font-size:13.5px;line-height:1.5;overflow-x:hidden}
+body.rtl{direction:rtl;text-align:right;font-family:'Cairo','Plus Jakarta Sans',sans-serif}
+.font-mono{font-family:'JetBrains Mono',monospace}
+a{text-decoration:none;color:inherit}
+.bg-primary-app{background:linear-gradient(135deg,var(--primary),var(--primary-light))!important;color:#fff!important}
+.btn-primary-app{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary-app:hover{background:var(--primary-light);border-color:var(--primary-light);color:#fff}
+.btn-accent{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn-accent:hover{background:#e65f00;color:#fff}
+.card{border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);background:#fff}
+
+/* TOPBAR & HEADER */
+.topbar{background:#0a291f;color:#e2e8f0;font-size:11.5px;padding:6px 0}
+.topbar a{color:#cbd5e1}
+.topbar a:hover{color:var(--gold)}
+.public-header{background:#fff;padding:12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.04);position:sticky;top:0;z-index:999}
+.brand-title{font-size:22px;font-weight:800;color:var(--primary);display:flex;align-items:center;gap:8px}
+.brand-title span{color:var(--accent)}
+.public-nav{background:var(--primary);padding:0}
+.public-nav .nav-link{color:#fff!important;padding:10px 16px;font-weight:600;font-size:13px}
+.public-nav .nav-link:hover{background:rgba(255,255,255,0.1)}
+
+/* PRODUCT CARDS */
+.product-card{border-radius:var(--radius);overflow:hidden;background:#fff;border:1px solid var(--border);transition:all .25s ease;height:100%;display:flex;flex-direction:column}
+.product-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:var(--primary-light)}
+.product-thumb{position:relative;background:#f1f5f9;height:140px;display:flex;align-items:center;justify-content:center;font-size:60px}
+.product-badge{position:absolute;top:8px;left:8px;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px}
+.product-body{padding:12px;display:flex;flex-direction:column;flex-grow:1}
+
+/* SIDEBAR & ADMIN */
+#adminApp{display:none}
+.sidebar{position:fixed;top:0;left:0;width:260px;height:100vh;background:linear-gradient(180deg,#0a291f 0%,#0f4c3a 50%,#1e7e34 100%);color:#fff;overflow-y:auto;z-index:1030;transition:.3s}
+body.rtl .sidebar{left:auto;right:0}
+.sidebar .brand{padding:16px 12px;text-align:center;border-bottom:1px solid rgba(255,255,255,0.12)}
+.menu-group{padding:10px 14px 4px;font-size:10px;text-transform:uppercase;color:rgba(255,255,255,0.55);letter-spacing:1px;font-weight:700}
+.sidebar .nav-link{color:rgba(255,255,255,0.85);padding:7.5px 14px;font-size:12.5px;display:flex;align-items:center;gap:9px;border-radius:8px;margin:2px 8px;cursor:pointer}
+.sidebar .nav-link:hover,.sidebar .nav-link.active{background:rgba(255,255,255,0.18);color:#fff;font-weight:600}
+.admin-main{margin-left:260px;padding:16px;min-height:100vh}
+body.rtl .admin-main{margin-left:0;margin-right:260px}
+@media(max-width:991px){
+  .sidebar{transform:translateX(-100%)}
+  body.rtl .sidebar{transform:translateX(100%)}
+  .sidebar.open{transform:translateX(0)}
+  .admin-main{margin-left:0;padding:10px}
+  body.rtl .admin-main{margin-right:0}
+}
+.mobile-toggle{display:none;position:fixed;bottom:20px;left:20px;z-index:1040;width:48px;height:48px;border-radius:50%;background:var(--primary);color:#fff;border:none;box-shadow:var(--shadow-lg)}
+@media(max-width:991px){.mobile-toggle{display:block}}
+
+/* KANBAN FOR SCIENCE TASKS */
+.kanban-board{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;align-items:start}
+.kanban-col{background:#f1f5f9;border-radius:12px;padding:12px;border:1px solid var(--border);min-height:400px}
+.kanban-col-header{font-weight:700;font-size:12px;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.task-card{background:#fff;border-radius:8px;padding:12px;border:1px solid var(--border);box-shadow:0 2px 6px rgba(0,0,0,0.04);margin-bottom:10px;cursor:pointer;transition:transform .15s}
+.task-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.badge-tag{font-size:10px;padding:2px 6px;border-radius:6px;font-weight:600}
+
+/* FLOATING AI COPILOT */
+.ai-toggle{position:fixed;bottom:20px;right:20px;z-index:1050;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#0a291f,#1e7e34);color:var(--gold);border:2px solid var(--gold);box-shadow:var(--shadow-lg);font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.ai-modal{position:fixed;bottom:85px;right:20px;width:380px;height:580px;background:#fff;border-radius:16px;box-shadow:0 14px 45px rgba(0,0,0,0.3);z-index:1050;display:none;flex-direction:column;overflow:hidden;border:1px solid var(--border)}
+.ai-modal.open{display:flex}
+@media(max-width:576px){.ai-modal{width:calc(100vw - 30px);height:500px;right:15px;bottom:80px}}
+
+/* TOASTS */
+#toastContainer{position:fixed;top:16px;right:16px;z-index:3000;display:flex;flex-direction:column;gap:8px;max-width:320px}
+.app-toast{padding:10px 14px;border-radius:8px;color:#fff;font-weight:600;font-size:12.5px;box-shadow:0 8px 24px rgba(0,0,0,0.2);display:flex;align-items:center;gap:8px}
+.app-toast.success{background:#1e7e34}.app-toast.error{background:#dc2626}.app-toast.info{background:#0284c7}
+</style>
 </head>
 <body>
-<p>Redirecting to <a href="app/src/main/assets/web/index.html">RST Electronics Web ERP Suite</a>...</p>
+
+<div id="toastContainer"></div>
+
+<!-- ========================================== -->
+<!--             PUBLIC WEB SHOP                -->
+<!-- ========================================== -->
+<div id="publicApp">
+  <!-- Topbar -->
+  <div class="topbar">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>
+        <i class="fas fa-map-marker-alt text-warning me-1"></i> Mabellah Sanaya, Road 6, Oman |
+        <i class="fas fa-phone text-warning ms-2 me-1"></i> +968 9430 1393 | CR: 1374092
+      </div>
+      <div class="d-flex align-items-center gap-2">
+        <select id="langSelectPublic" class="form-select form-select-sm bg-dark text-white border-secondary py-0" style="width:auto;font-size:11px" onchange="setLanguage(this.value)">
+          <option value="en">English (EN)</option>
+          <option value="bn">বাংলা (BN)</option>
+          <option value="ar">العربية (AR)</option>
+        </select>
+        <button class="btn btn-sm btn-outline-warning py-0 px-2" style="font-size:11px" onclick="showAdminLoginModal()">
+          <i class="fas fa-user-shield me-1"></i> <span data-i18n="admin_login">Admin ERP</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="public-header">
+    <div class="container d-flex align-items-center justify-content-between gap-3 flex-wrap">
+      <a href="#" class="brand-title" onclick="showPublicPage('home');return false">
+        <i class="fas fa-store"></i> RST <span>ELECTRONICS</span>
+      </a>
+      <div class="flex-grow-1 mx-3" style="max-width:480px">
+        <div class="input-group input-group-sm">
+          <input type="text" id="publicSearchInput" class="form-control" placeholder="Search mobile, TV, IMEI, barcode..." data-i18n-placeholder="search_placeholder" onkeyup="searchProducts(this.value)">
+          <button class="btn btn-primary-app"><i class="fas fa-search"></i></button>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm btn-outline-success position-relative" onclick="openCartDrawer()">
+          <i class="fas fa-shopping-cart"></i> <span data-i18n="cart">Cart</span>
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav class="public-nav">
+    <div class="container">
+      <ul class="nav">
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showPublicPage('home');return false" data-i18n="home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showPublicPage('shop');return false" data-i18n="shop">Catalog</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showPublicPage('telecom');return false" data-i18n="telecom">Oman Telecom Recharge</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showPublicPage('utility');return false" data-i18n="utility">Utility Bills</a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showPublicPage('science');return false"><i class="fas fa-flask text-warning me-1"></i> <span data-i18n="science_skills">Science Skills & Tasks</span></a></li>
+        <li class="nav-item"><a class="nav-link" href="#" onclick="showPublicPage('about');return false" data-i18n="about">About & CR</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- ================= PUBLIC PAGES ================= -->
+  <!-- 1. HOME -->
+  <div id="page-home" class="public-page container py-4">
+    <!-- Hero Banner -->
+    <div class="card p-4 p-md-5 mb-4 text-white" style="background:linear-gradient(135deg,#0a291f,#1e7e34)">
+      <div class="row align-items-center">
+        <div class="col-lg-8">
+          <span class="badge bg-warning text-dark mb-2 font-mono">AUTHORIZED OMAN ELECTRONICS & 5G HUB</span>
+          <h1 class="display-6 fw-bold mb-2" data-i18n="hero_title">Best Electronics & Real-Time Sync Task Suite</h1>
+          <p class="text-light opacity-90 mb-4" data-i18n="hero_sub">Smartphones, TVs, Laptops, Accessories with GCC Warranty & Instant Oman Telecom Recharge</p>
+          <div class="d-flex gap-2 flex-wrap">
+            <button class="btn btn-warning fw-bold px-4" onclick="showPublicPage('shop')" data-i18n="shop_now">Explore Shop</button>
+            <button class="btn btn-outline-light px-3" onclick="showPublicPage('telecom')">Omantel & Ooredoo Top-up</button>
+            <button class="btn btn-light px-3 text-dark fw-bold" onclick="showPublicPage('science')"><i class="fas fa-atom text-primary me-1"></i> Science Tasks</button>
+          </div>
+        </div>
+        <div class="col-lg-4 text-center mt-3 mt-lg-0">
+          <i class="fas fa-microchip" style="font-size:110px;color:rgba(251,191,36,0.25)"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Services -->
+    <div class="row g-3 mb-4 text-center">
+      <div class="col-6 col-md-3"><div class="card p-3 h-100"><i class="fas fa-shield-alt text-success fs-3 mb-2"></i><h6 class="mb-1">100% Official</h6><small class="text-muted">IMEI GCC Warranty</small></div></div>
+      <div class="col-6 col-md-3"><div class="card p-3 h-100"><i class="fas fa-bolt text-warning fs-3 mb-2"></i><h6 class="mb-1">Instant Top-Up</h6><small class="text-muted">All Oman Operators</small></div></div>
+      <div class="col-6 col-md-3"><div class="card p-3 h-100"><i class="fas fa-sync-alt text-primary fs-3 mb-2"></i><h6 class="mb-1">Real-Time Sync</h6><small class="text-muted">Multi-Device Live State</small></div></div>
+      <div class="col-6 col-md-3"><div class="card p-3 h-100"><i class="fas fa-brain text-danger fs-3 mb-2"></i><h6 class="mb-1">Gemini AI Inside</h6><small class="text-muted">Low Latency & Thinking</small></div></div>
+    </div>
+
+    <!-- Featured Products -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="fw-bold mb-0" data-i18n="featured_products">Featured Devices</h4>
+      <button class="btn btn-sm btn-outline-primary" onclick="showPublicPage('shop')" data-i18n="view_all">View All</button>
+    </div>
+    <div class="row g-3" id="homeProductGrid"></div>
+  </div>
+
+  <!-- 2. SHOP -->
+  <div id="page-shop" class="public-page container py-4" style="display:none">
+    <div class="row g-3">
+      <div class="col-lg-3">
+        <div class="card p-3 mb-3">
+          <h6 class="fw-bold mb-2" data-i18n="categories">Categories</h6>
+          <div class="list-group list-group-flush" id="shopCategoryFilter"></div>
+        </div>
+        <div class="card p-3">
+          <h6 class="fw-bold mb-2">Sort By</h6>
+          <select class="form-select form-select-sm" onchange="sortProducts(this.value)">
+            <option value="newest">Newest First</option>
+            <option value="price_low">Price: Low to High</option>
+            <option value="price_high">Price: High to Low</option>
+            <option value="name">Name (A-Z)</option>
+          </select>
+        </div>
+      </div>
+      <div class="col-lg-9">
+        <div class="row g-3" id="shopProductGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. TELECOM -->
+  <div id="page-telecom" class="public-page container py-4" style="display:none">
+    <h4 class="fw-bold mb-1" data-i18n="telecom_recharge">Oman Telecom Instant Recharge</h4>
+    <p class="text-muted mb-4 small">Live recharge gateway for Omantel, Ooredoo, Vodafone, FRiENDi, Renna & Awasr</p>
+    <div class="row g-3" id="telecomOperatorCards"></div>
+  </div>
+
+  <!-- 4. UTILITY -->
+  <div id="page-utility" class="public-page container py-4" style="display:none">
+    <h4 class="fw-bold mb-1" data-i18n="utility_bills">Electricity, Water & Internet Bills</h4>
+    <p class="text-muted mb-4 small">Pay Nama (ONEIC), Diam Water, and Home Fiber bills in one secure counter</p>
+    <div class="row g-3" id="utilityCards"></div>
+  </div>
+
+  <!-- 5. SCIENCE SKILLS & REAL-TIME TASKS -->
+  <div id="page-science" class="public-page container py-4" style="display:none">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+      <div>
+        <h4 class="fw-bold mb-0"><i class="fas fa-atom text-success me-2"></i>Science Skills & Collaborative Task Board</h4>
+        <small class="text-muted">Real-time synced across all connected devices | Scientific Method & Experiment Tracking</small>
+      </div>
+      <div class="d-flex gap-2">
+        <span class="badge bg-success d-flex align-items-center"><i class="fas fa-wifi me-1"></i> Synced Across Devices</span>
+        <button class="btn btn-sm btn-primary-app" onclick="openNewScienceTaskModal()"><i class="fas fa-plus me-1"></i> New Science Task</button>
+      </div>
+    </div>
+
+    <!-- Science Skills Tools Bar -->
+    <div class="card p-3 mb-4 bg-light">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-4">
+          <small class="fw-bold text-muted d-block">Quick Science Calculator:</small>
+          <div class="input-group input-group-sm">
+            <input type="number" id="calcVolts" class="form-control" placeholder="Volts (V)">
+            <input type="number" id="calcOhms" class="form-control" placeholder="Ohms (Ω)">
+            <button class="btn btn-dark" onclick="calculateOhmsLaw()">Calc Amps</button>
+          </div>
+          <small id="ohmsLawResult" class="text-success fw-bold"></small>
+        </div>
+        <div class="col-md-8 text-md-end">
+          <button class="btn btn-sm btn-outline-dark me-1" onclick="askAiScienceMethod()"><i class="fas fa-lightbulb text-warning me-1"></i> AI Experiment Advisor</button>
+          <button class="btn btn-sm btn-outline-success" onclick="broadcastTaskSync()"><i class="fas fa-sync-alt me-1"></i> Force Broadcast Sync</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kanban Task Board -->
+    <div class="kanban-board">
+      <div class="kanban-col" id="col-todo">
+        <div class="kanban-col-header text-secondary"><span>To Do / Proposed</span><span class="badge bg-secondary" id="cnt-todo">0</span></div>
+        <div class="task-list" id="list-todo"></div>
+      </div>
+      <div class="kanban-col" id="col-in_progress">
+        <div class="kanban-col-header text-primary"><span>In Progress / Lab</span><span class="badge bg-primary" id="cnt-in_progress">0</span></div>
+        <div class="task-list" id="list-in_progress"></div>
+      </div>
+      <div class="kanban-col" id="col-review">
+        <div class="kanban-col-header text-warning"><span>Review / Data Check</span><span class="badge bg-warning text-dark" id="cnt-review">0</span></div>
+        <div class="task-list" id="list-review"></div>
+      </div>
+      <div class="kanban-col" id="col-completed">
+        <div class="kanban-col-header text-success"><span>Completed / Verified</span><span class="badge bg-success" id="cnt-completed">0</span></div>
+        <div class="task-list" id="list-completed"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. ABOUT -->
+  <div id="page-about" class="public-page container py-4" style="display:none">
+    <div class="card p-4">
+      <h3 class="fw-bold mb-3 text-primary">AL WAHA AL KHDRA AL MUTAKAMILAH TRADING</h3>
+      <p class="lead">Operating as <strong>RST ELECTRONICS</strong> — Sultanate of Oman</p>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <ul class="list-unstyled space-y-2">
+            <li><strong>Commercial Registration (CR):</strong> 1374092</li>
+            <li><strong>Address:</strong> Mabellah Sanaya, Road No 6, Muscat, Sultanate of Oman</li>
+            <li><strong>Telephone / WhatsApp:</strong> +968 9430 1393</li>
+            <li><strong>Official Email:</strong> Eletrocnisrst@gmail.com / assalatasom@gmail.com</li>
+            <li><strong>Operating Hours:</strong> 9:00 AM — 10:00 PM (GST)</li>
+          </ul>
+        </div>
+        <div class="col-md-6">
+          <div class="alert alert-success">
+            <h6><i class="fas fa-check-circle me-1"></i> Multi-Device Sync Enterprise</h6>
+            <p class="small mb-0">Our Web ERP suite supports cross-device real-time sync, barcode & IMEI tracking, Oman telecom settlement, and science project task workflows with Gemini AI intelligence.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!--                 CART DRAWER                -->
+<!-- ========================================== -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas">
+  <div class="offcanvas-header bg-dark text-white">
+    <h5 class="offcanvas-title"><i class="fas fa-shopping-bag me-2"></i><span data-i18n="cart">Cart</span></h5>
+    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body" id="cartDrawerBody"></div>
+</div>
+
+<!-- ========================================== -->
+<!--             ADMIN ERP APPLICATION          -->
+<!-- ========================================== -->
+<div id="adminApp">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <h4 class="mb-0 fw-bold"><i class="fas fa-boxes"></i> <span style="color:var(--gold)">RST</span> ERP</h4>
+      <small class="text-white-50">Enterprise Edition | Oman</small>
+    </div>
+
+    <div class="menu-group">Core</div>
+    <a class="nav-link" data-admin-page="dashboard"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a>
+    <a class="nav-link" data-admin-page="pos"><i class="fas fa-cash-register"></i> <span>POS Terminal</span></a>
+    <a class="nav-link" data-admin-page="scienceTasks"><i class="fas fa-flask text-warning"></i> <span>Science & Lab Tasks</span></a>
+
+    <div class="menu-group">Inventory & Items</div>
+    <a class="nav-link" data-admin-page="addItem"><i class="fas fa-plus-circle"></i> <span>Add Item (Sorol Hisab)</span></a>
+    <a class="nav-link" data-admin-page="items"><i class="fas fa-list"></i> <span>Items & IMEI Stock</span></a>
+    <a class="nav-link" data-admin-page="barcodeStudio"><i class="fas fa-barcode"></i> <span>Barcode Studio</span></a>
+    <a class="nav-link" data-admin-page="transfers"><i class="fas fa-exchange-alt"></i> <span>Branch Transfers</span></a>
+
+    <div class="menu-group">Oman Telecom & Bills</div>
+    <a class="nav-link" data-admin-page="telecomPOS"><i class="fas fa-sim-card"></i> <span>Telecom POS</span></a>
+    <a class="nav-link" data-admin-page="telecomSettings"><i class="fas fa-cogs"></i> <span>Margin Settings</span></a>
+    <a class="nav-link" data-admin-page="utilityPOS"><i class="fas fa-bolt"></i> <span>Utility POS</span></a>
+
+    <div class="menu-group">Sales & Reports</div>
+    <a class="nav-link" data-admin-page="invoices"><i class="fas fa-file-invoice"></i> <span>Tax Invoices</span></a>
+    <a class="nav-link" data-admin-page="customers"><i class="fas fa-users"></i> <span>VIP Customers</span></a>
+    <a class="nav-link" data-admin-page="reports"><i class="fas fa-chart-line"></i> <span>Financial Reports</span></a>
+
+    <div class="menu-group">Administration</div>
+    <a class="nav-link" data-admin-page="languageEditor"><i class="fas fa-language"></i> <span>Language Editor</span> <span class="badge bg-warning text-dark ms-auto" style="font-size:9px">BN/EN/AR</span></a>
+    <a class="nav-link" data-admin-page="users"><i class="fas fa-user-lock"></i> <span>Users & Roles</span></a>
+    <a class="nav-link" data-admin-page="backup"><i class="fas fa-database"></i> <span>Lifetime Backup</span></a>
+    <a class="nav-link text-warning mt-3" onclick="exitAdminToPublic()"><i class="fas fa-store"></i> <span>Back to Web Shop</span></a>
+    <a class="nav-link text-danger" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> <span>Logout</span></a>
+  </aside>
+
+  <button class="mobile-toggle" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+
+  <!-- ADMIN CONTENT -->
+  <main class="admin-main">
+    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+      <div class="d-flex align-items-center gap-2">
+        <span class="badge bg-success p-2" id="adminUserBadge">Admin: system</span>
+        <span class="badge bg-dark p-2" id="adminBranchBadge">Mabellah Main Branch</span>
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-sm btn-outline-dark" onclick="openScannerModal('pos')"><i class="fas fa-camera me-1"></i> Scan Barcode</button>
+        <button class="btn btn-sm btn-success" onclick="navigateAdmin('pos')"><i class="fas fa-cash-register me-1"></i> POS</button>
+      </div>
+    </div>
+    <div id="adminPageContainer"></div>
+  </main>
+</div>
+
+<!-- ========================================== -->
+<!--          MODALS & FLOATING TOOLS           -->
+<!-- ========================================== -->
+<!-- Admin Login Modal -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title"><i class="fas fa-lock me-2"></i>RST ERP Authentication</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form onsubmit="handleAdminLogin(event)">
+          <div class="mb-3">
+            <label class="form-label fw-bold">Username</label>
+            <input type="text" id="loginUsername" class="form-control" required value="admin">
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-bold">Password / PIN</label>
+            <input type="password" id="loginPassword" class="form-control" required value="123">
+          </div>
+          <button type="submit" class="btn btn-primary-app w-100 py-2 fw-bold">Login to Enterprise ERP</button>
+        </form>
+        <div class="mt-3 text-muted small text-center">Demo: <code>admin/123</code> | <code>staff/123</code> | <code>dealer/123</code></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Camera Barcode Scanner Modal -->
+<div class="modal fade" id="scannerModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title"><i class="fas fa-barcode me-2"></i>Live Camera Barcode Scanner</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" onclick="stopScanner()"></button>
+      </div>
+      <div class="modal-body text-center p-3">
+        <div id="scannerReader" style="width:100%;min-height:240px;background:#000;border-radius:8px"></div>
+        <p class="text-muted small mt-2">Align EAN-13, CODE128, or QR barcode inside camera view</p>
+        <div class="input-group input-group-sm mt-2">
+          <input type="text" id="manualScannerInput" class="form-control font-mono" placeholder="Or type barcode / IMEI manually">
+          <button class="btn btn-dark" onclick="submitManualScanner()">Apply</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- New Science Task Modal -->
+<div class="modal fade" id="scienceTaskModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-dark text-white">
+        <h5 class="modal-title"><i class="fas fa-flask text-warning me-2"></i>New Science Skills & Research Task</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4">
+        <form onsubmit="handleCreateScienceTask(event)">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label fw-bold">Experiment / Task Title *</label>
+              <input type="text" id="st_title" class="form-control" required placeholder="e.g. Verify Semiconductor Junction Temperature Coefficient">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Field / Category</label>
+              <select id="st_category" class="form-select">
+                <option>Electronics & Physics</option>
+                <option>Chemical Solutions & Battery Testing</option>
+                <option>Quality Assurance & Calibration</option>
+                <option>STEM Scientific Method</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Stage</label>
+              <select id="st_stage" class="form-select">
+                <option value="todo">Observation / Proposal</option>
+                <option value="in_progress">Active Experiment</option>
+                <option value="review">Data Verification</option>
+                <option value="completed">Completed & Published</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Priority</label>
+              <select id="st_priority" class="form-select">
+                <option value="High">High Priority</option>
+                <option value="Medium">Medium</option>
+                <option value="Urgent">Urgent Critical</option>
+                <option value="Low">Low</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Due Date</label>
+              <input type="date" id="st_duedate" class="form-control" value="2026-10-25">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-bold">Scientific Hypothesis *</label>
+              <textarea id="st_hypothesis" class="form-control" rows="2" placeholder="If independent variable X increases, then dependent variable Y will behave as..."></textarea>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Independent Variable</label>
+              <input type="text" id="st_indep" class="form-control" placeholder="e.g. Voltage (0 to 12V)">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Dependent Variable</label>
+              <input type="text" id="st_dep" class="form-control" placeholder="e.g. Current (mA) & Thermal Dissipation">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label fw-bold">Control Variables</label>
+              <input type="text" id="st_control" class="form-control" placeholder="e.g. Ambient Temperature 25°C">
+            </div>
+            <div class="col-12">
+              <label class="form-label fw-bold">Apparatus / Equipment Checklist</label>
+              <input type="text" id="st_apparatus" class="form-control" placeholder="Digital Multimeter, DC Power Supply, Thermal Camera, Resistor Array">
+            </div>
+          </div>
+          <div class="mt-4 pt-2 border-top d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success fw-bold"><i class="fas fa-save me-1"></i> Save Task (Real-Time Sync)</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!--     GEMINI AI COPILOT (3 MODES REQUIRED)   -->
+<!-- ========================================== -->
+<button class="ai-toggle" onclick="toggleAiModal()" title="Gemini AI Assistant"><i class="fas fa-brain"></i></button>
+
+<div class="ai-modal" id="aiModal">
+  <div class="p-3 bg-dark text-white d-flex justify-content-between align-items-center">
+    <div>
+      <h6 class="mb-0 fw-bold"><i class="fas fa-robot text-warning me-1"></i> Gemini AI Assistant</h6>
+      <small style="font-size:10px" class="text-light opacity-75">Low-Latency • Video Analysis • High Thinking</small>
+    </div>
+    <button class="btn btn-sm btn-close btn-close-white" onclick="toggleAiModal()"></button>
+  </div>
+  <!-- AI Mode Selector -->
+  <div class="bg-light p-2 border-bottom">
+    <div class="btn-group btn-group-sm w-100" role="group">
+      <button type="button" class="btn btn-outline-primary active" id="btn-mode-flash" onclick="setAiMode('flash')">
+        <i class="fas fa-bolt"></i> Low-Latency (3.1 Lite)
+      </button>
+      <button type="button" class="btn btn-outline-primary" id="btn-mode-video" onclick="setAiMode('video')">
+        <i class="fas fa-video"></i> Video Analyzer (3.1 Pro)
+      </button>
+      <button type="button" class="btn btn-outline-primary" id="btn-mode-think" onclick="setAiMode('think')">
+        <i class="fas fa-brain"></i> High Thinking (3.1 Pro)
+      </button>
+    </div>
+  </div>
+  <!-- Chat Messages -->
+  <div class="flex-grow-1 p-3 overflow-y-auto" id="aiChatMessages" style="background:#f8fafc">
+    <div class="alert alert-info p-2 small mb-2">
+      👋 <strong>RST Intelligent Assistant ready.</strong>
+      <div id="aiModeDescription" class="mt-1">Mode: <strong>Low-Latency (gemini-3.1-flash-lite)</strong> for instant response.</div>
+    </div>
+  </div>
+  <!-- Video Upload/URL panel (only shown in video mode) -->
+  <div id="aiVideoInputPanel" class="p-2 bg-light border-top" style="display:none">
+    <input type="text" id="aiVideoUrl" class="form-control form-control-sm mb-1" placeholder="Enter Video URL or description of lab/device footage">
+    <input type="file" id="aiVideoFile" class="form-control form-control-sm" accept="video/*">
+  </div>
+  <!-- Input Area -->
+  <div class="p-2 bg-white border-top d-flex gap-2">
+    <input type="text" id="aiChatInput" class="form-control form-control-sm" placeholder="Ask about tasks, formulas, inventory, code..." onkeypress="if(event.key==='Enter')sendAiQuery()">
+    <button class="btn btn-sm btn-success" onclick="sendAiQuery()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ==========================================
+// 1. STATE & CONFIGURATION
+// ==========================================
+const CONFIG = {
+  business_name: 'RST ELECTRONICS',
+  legal_name: 'AL WAHA AL KHDRA AL MUTAKAMILAH TRADING',
+  cr_no: '1374092', phone: '+968 9430 1393', email: 'Eletrocnisrst@gmail.com',
+  address: 'Mabellah Sanaya, Road No 6, Muscat, Sultanate of Oman',
+  currency: 'OMR', vatRate: 0.05, decimalPlaces: 3, invoice_prefix: 'RST'
+};
+
+function ls(k, def) { try { return JSON.parse(localStorage.getItem(k)) || def; } catch(e) { return def; } }
+function sv(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+function fmt(n) { return Number(n || 0).toFixed(CONFIG.decimalPlaces); }
+function cur() { return CONFIG.currency; }
+function uid() { return Date.now() + Math.floor(Math.random()*1000); }
+
+// Synthesized Sound Engine
+const SoundEngine = {
+  ctx: null,
+  init() { if(!this.ctx) { try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} } },
+  play(freq, dur, type='sine', vol=0.08) {
+    if (window.AndroidBridge && window.AndroidBridge.playBeep) {
+      if (freq > 800) window.AndroidBridge.playSuccessTone(); else window.AndroidBridge.playBeep();
+      return;
+    }
+    this.init(); if(!this.ctx) return;
+    try {
+      const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+      o.type = type; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol, this.ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + dur);
+      o.connect(g); g.connect(this.ctx.destination);
+      o.start(); o.stop(this.ctx.currentTime + dur);
+    } catch(e){}
+  },
+  beep() { this.play(1040, 0.08); },
+  click() { this.play(600, 0.03); },
+  success() { this.play(880, 0.1); setTimeout(() => this.play(1320, 0.15), 80); },
+  error() { this.play(220, 0.25, 'sawtooth', 0.12); }
+};
+
+function toast(msg, type='success') {
+  const el = document.createElement('div');
+  el.className = `app-toast ${type}`;
+  el.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':type==='error'?'exclamation-circle':'info-circle'}"></i> <span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3200);
+  if (type === 'success') SoundEngine.success(); else if (type === 'error') SoundEngine.error(); else SoundEngine.beep();
+}
+
+// ==========================================
+// 2. MULTI-LANGUAGE SYSTEM (EN / BN / AR)
+// ==========================================
+const DEFAULT_STRINGS = {
+  en: {
+    home: 'Home', shop: 'Catalog', telecom: 'Oman Telecom Recharge', utility: 'Utility Bills',
+    science_skills: 'Science Skills & Tasks', about: 'About & CR', admin_login: 'Admin ERP',
+    cart: 'Cart', search_placeholder: 'Search mobile, TV, IMEI, barcode...',
+    hero_title: 'Best Electronics & Real-Time Sync Task Suite',
+    hero_sub: 'Smartphones, TVs, Laptops, Accessories with GCC Warranty & Instant Oman Telecom Recharge',
+    shop_now: 'Explore Shop', featured_products: 'Featured Devices', view_all: 'View All',
+    categories: 'Categories', telecom_recharge: 'Oman Telecom Instant Recharge', utility_bills: 'Electricity, Water & Internet Bills'
+  },
+  bn: {
+    home: 'হোম', shop: 'শপ ক্যাটালগ', telecom: 'ওমান টেলিকম রিচার্জ', utility: 'ইউটিলিটি বিল',
+    science_skills: 'সায়েন্স স্কিল ও টাস্ক', about: 'আমাদের সম্পর্কে', admin_login: 'অ্যাডমিন ইআরপি',
+    cart: 'কার্ট', search_placeholder: 'পণ্য, টিভি, আইএমইআই, বারকোড খুঁজুন...',
+    hero_title: 'সেরা ইলেকট্রনিক্স ও রিয়েল-টাইম সিঙ্ক টাস্ক স্যুট',
+    hero_sub: 'স্মার্টফোন, টিভি, ল্যাপটপ, অ্যাকসেসরিজ ও তাত্ক্ষণিক ওমান টেলিকম রিচার্জ',
+    shop_now: 'শপিং শুরু করুন', featured_products: 'ফিচারড পণ্যসমূহ', view_all: 'সব দেখুন',
+    categories: 'ক্যাটাগরি', telecom_recharge: 'মোবাইল রিচার্জ সুবিধা', utility_bills: 'বিদ্যুৎ, পানি ও ইন্টারনেট বিল'
+  },
+  ar: {
+    home: 'الرئيسية', shop: 'المتجر', telecom: 'إعادة شحن اتصالات عمان', utility: 'فواتير الخدمات',
+    science_skills: 'مهام ومهارات العلوم', about: 'من نحن والسجل التجاري', admin_login: 'نظام الإدارة ERP',
+    cart: 'السلة', search_placeholder: 'ابحث عن الهواتف، التلفزيونات، IMEI، الباركود...',
+    hero_title: 'أفضل الإلكترونيات ومنظومة مزامنة المهام المباشرة',
+    hero_sub: 'هواتف ذكية، شاشات، لابتوبات مع ضمان دول مجلس التعاون وشحن اتصالات عمان فوري',
+    shop_now: 'تسوق الآن', featured_products: 'الأجهزة المميزة', view_all: 'عرض الكل',
+    categories: 'الفئات', telecom_recharge: 'شحن رصيد عمانتل وأوريدو وفودافون', utility_bills: 'فواتير الكهرباء والمياه والإنترنت'
+  }
+};
+
+let currentLang = localStorage.getItem('rst_lang') || 'en';
+let STRINGS = ls('rst_editable_strings', JSON.parse(JSON.stringify(DEFAULT_STRINGS)));
+
+function t(key) { return STRINGS[currentLang]?.[key] || DEFAULT_STRINGS[currentLang]?.[key] || key; }
+
+function setLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('rst_lang', lang);
+  document.body.classList.toggle('rtl', lang === 'ar');
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+  const sel = document.getElementById('langSelectPublic');
+  if (sel) sel.value = lang;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (k) el.textContent = t(k);
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const k = el.dataset.i18nPlaceholder;
+    if (k) el.placeholder = t(k);
+  });
+  renderPublicProducts();
+}
+
+// ==========================================
+// 3. DATABASE (PRODUCTS, TASKS, TELECOM)
+// ==========================================
+let products = ls('rst_products', [
+  { id: 1, name: 'iPhone 15 Pro Max 256GB', brand: 'Apple', category: 'Mobile', price: 479.000, cost: 410.000, stock: 12, barcode: '8901234567890', imei: '356789123456789', icon: '📱', featured: true },
+  { id: 2, name: 'Samsung Galaxy S24 Ultra 5G', brand: 'Samsung', category: 'Mobile', price: 429.000, cost: 365.000, stock: 9, barcode: '8901234567891', imei: '987654321123456', icon: '📱', featured: true },
+  { id: 3, name: 'Sony WH-1000XM5 ANC Headphones', brand: 'Sony', category: 'Audio', price: 134.900, cost: 105.000, stock: 18, barcode: '8901234567892', imei: '', icon: '🎧', featured: true },
+  { id: 4, name: 'Samsung 65" Crystal UHD 4K Smart TV', brand: 'Samsung', category: 'TV', price: 225.000, cost: 175.000, stock: 6, barcode: '8901234567893', imei: '', icon: '📺', featured: true },
+  { id: 5, name: 'Xiaomi Redmi Note 13 Pro 5G', brand: 'Xiaomi', category: 'Mobile', price: 112.500, cost: 88.000, stock: 24, barcode: '8901234567894', imei: '864209753124680', icon: '📱', featured: true },
+  { id: 6, name: 'Apple MacBook Air 15" M3 Chip', brand: 'Apple', category: 'Laptop', price: 565.000, cost: 485.000, stock: 5, barcode: '8901234567895', imei: '', icon: '💻', featured: true }
+]);
+
+let telecomOps = ls('rst_telecomOps', [
+  { id: 1, name: 'Omantel (Hayyak / Baqati)', code: 'OMT', color: '#008542', balance: 450.000, margin: 2.5, type: 'percent', latency: 18 },
+  { id: 2, name: 'Ooredoo Oman (Shababiah)', code: 'OOD', color: '#e11d48', balance: 320.500, margin: 0.055, type: 'fixed', latency: 22 },
+  { id: 3, name: 'Vodafone Oman (5G Red)', code: 'VDF', color: '#dc2626', balance: 280.000, margin: 2.8, type: 'percent', latency: 16 },
+  { id: 4, name: 'Awasr Fiber High-Speed', code: 'AWS', color: '#0284c7', balance: 500.000, margin: 3.5, type: 'percent', latency: 9 },
+  { id: 5, name: 'FRiENDi Mobile Oman', code: 'FRD', color: '#7c3aed', balance: 150.000, margin: 0.040, type: 'fixed', latency: 27 },
+  { id: 6, name: 'Renna Mobile Oman', code: 'RNN', color: '#ea580c', balance: 115.000, margin: 0.035, type: 'fixed', latency: 29 }
+]);
+
+let utilityOps = ls('rst_utilityOps', [
+  { id: 1, name: 'Nama Electricity Supply (ONEIC)', code: 'ELEC', icon: 'bolt', margin: 1.2 },
+  { id: 2, name: 'Diam / Nama Water Services', code: 'WATER', icon: 'tint', margin: 1.2 },
+  { id: 3, name: 'Omantel / Awasr Home Fiber Bill', code: 'FIBER', icon: 'wifi', margin: 2.0 }
+]);
+
+// Real-Time Synced Science Tasks Database
+let scienceTasks = ls('rst_science_tasks', [
+  {
+    id: 101,
+    title: 'Semiconductor Junction Thermal Drift Experiment',
+    category: 'Electronics & Physics',
+    stage: 'in_progress', // todo, in_progress, review, completed
+    priority: 'High',
+    dueDate: '2026-10-18',
+    hypothesis: 'Forward voltage drop decreases linearly at -2.1mV/°C as junction temperature rises from 25°C to 75°C.',
+    independentVar: 'Temperature (25°C - 75°C)',
+    dependentVar: 'Forward Voltage Vf (mV)',
+    controlVar: 'Constant current 10.0mA',
+    apparatus: 'DMM Keithley 2000, Temperature Chamber, K-Type Thermocouple',
+    observations: 'Confirmed -2.08mV/°C slope with R² = 0.998 across 5 trial runs.',
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 102,
+    title: '5G NR Signal Attenuation Through Reinforced Concrete',
+    category: 'STEM Scientific Method',
+    stage: 'todo',
+    priority: 'Medium',
+    dueDate: '2026-10-22',
+    hypothesis: '3.5GHz mid-band signals suffer >24dB path loss compared to sub-1GHz Hayyak channels.',
+    independentVar: 'Carrier frequency & wall thickness',
+    dependentVar: 'RSSI & SINR',
+    controlVar: 'Transmitter distance 15m',
+    apparatus: 'SDR Analyzer, Spectrum Analyzer, Reference Horn Antenna',
+    observations: 'Apparatus calibrated in Mabellah showroom testing bay.',
+    updatedAt: new Date().toISOString()
+  },
+  {
+    id: 103,
+    title: 'Li-Ion Battery Cell Degradation & Internal Resistance',
+    category: 'Chemical Solutions & Battery Testing',
+    stage: 'review',
+    priority: 'Urgent',
+    dueDate: '2026-10-15',
+    hypothesis: 'AC impedance at 1kHz correlates directly with discharge cycle count.',
+    independentVar: 'Discharge cycle count (1 to 500)',
+    dependentVar: 'AC ESR (mΩ)',
+    controlVar: 'Room temp 23°C, 1C discharge rate',
+    apparatus: 'Battery Impedance Meter, Electronic Load',
+    observations: 'ESR increased from 18mΩ to 44mΩ after 400 cycles.',
+    updatedAt: new Date().toISOString()
+  }
+]);
+
+let invoices = ls('rst_invoices', []);
+let cart = ls('rst_public_cart', []);
+let currentUser = null;
+
+function saveAll() {
+  sv('rst_products', products);
+  sv('rst_telecomOps', telecomOps);
+  sv('rst_science_tasks', scienceTasks);
+  sv('rst_invoices', invoices);
+  broadcastTaskSync();
+  // Sync to Cloud Server
+  try {
+    fetch('/api/state/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ products, telecomOps, utilityOps, scienceTasks, invoices, STRINGS })
+    }).catch(() => {});
+  } catch (e) {}
+}
+
+// ==========================================
+// 4. REAL-TIME MULTI-DEVICE SYNC ENGINE
+// ==========================================
+// Uses Web BroadcastChannel + Server-Sent Events (SSE) for instant multi-device synchronization
+const syncChannel = new BroadcastChannel('rst_sync_channel');
+
+syncChannel.onmessage = (event) => {
+  if (event.data?.type === 'SYNC_STATE') {
+    scienceTasks = ls('rst_science_tasks', scienceTasks);
+    products = ls('rst_products', products);
+    invoices = ls('rst_invoices', invoices);
+    renderScienceTasks();
+    renderPublicProducts();
+    if (document.getElementById('adminApp')?.style.display === 'block') {
+      adminPages.dashboard && navigateAdmin('dashboard');
+    }
+  }
+};
+
+window.addEventListener('storage', (e) => {
+  if (e.key === 'rst_science_tasks') {
+    scienceTasks = ls('rst_science_tasks', scienceTasks);
+    renderScienceTasks();
+  }
+});
+
+// Connect to Server-Sent Events (SSE) for real-time cloud device sync
+function initCloudStreamSync() {
+  try {
+    const evtSource = new EventSource('/api/stream');
+    evtSource.addEventListener('state_updated', () => {
+      fetch('/api/state')
+        .then(r => r.json())
+        .then(data => {
+          if (data.scienceTasks) scienceTasks = data.scienceTasks;
+          if (data.products) products = data.products;
+          if (data.invoices) invoices = data.invoices;
+          renderScienceTasks();
+          renderPublicProducts();
+          toast('⚡ Real-time cloud sync received from another device!', 'info');
+        })
+        .catch(() => {});
+    });
+  } catch (e) {}
+}
+
+function broadcastTaskSync() {
+  sv('rst_science_tasks', scienceTasks);
+  syncChannel.postMessage({ type: 'SYNC_STATE', timestamp: Date.now() });
+  toast('🔄 Synced across all connected devices in real-time!', 'info');
+}
+
+// ==========================================
+// 5. PUBLIC WEB SHOP LOGIC
+// ==========================================
+function showPublicPage(page) {
+  SoundEngine.click();
+  document.querySelectorAll('.public-page').forEach(p => p.style.display = 'none');
+  const target = document.getElementById('page-' + page);
+  if (target) target.style.display = 'block';
+  window.scrollTo(0,0);
+  if (page === 'shop') renderShopProducts();
+  if (page === 'telecom') renderTelecomPublic();
+  if (page === 'utility') renderUtilityPublic();
+  if (page === 'science') renderScienceTasks();
+  if (page === 'home') renderPublicProducts();
+}
+
+function renderPublicProducts() {
+  const container = document.getElementById('homeProductGrid');
+  if (!container) return;
+  const list = products.slice(0, 4);
+  container.innerHTML = list.map(p => productCardHtml(p)).join('');
+}
+
+function renderShopProducts(filterCat = 'All') {
+  const container = document.getElementById('shopProductGrid');
+  const filterList = document.getElementById('shopCategoryFilter');
+  if (!container) return;
+
+  const cats = ['All', 'Mobile', 'TV', 'Laptop', 'Audio'];
+  if (filterList) {
+    filterList.innerHTML = cats.map(c => `
+      <a href="#" class="list-group-item list-group-item-action ${c===filterCat?'active bg-success border-success':''}" onclick="renderShopProducts('${c}');return false">${c}</a>
+    `).join('');
+  }
+
+  const filtered = filterCat === 'All' ? products : products.filter(p => p.category === filterCat);
+  container.innerHTML = filtered.map(p => productCardHtml(p)).join('');
+}
+
+function productCardHtml(p) {
+  return `
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="product-card">
+        <div class="product-thumb">
+          <span>${p.icon || '📦'}</span>
+          ${p.stock < 8 ? '<span class="product-badge">Sale</span>' : ''}
+        </div>
+        <div class="product-body">
+          <small class="text-muted">${p.brand} • ${p.category}</small>
+          <h6 class="fw-bold my-1 text-truncate">${p.name}</h6>
+          <div class="small font-mono text-muted mb-2">Code: ${p.barcode}</div>
+          <div class="mt-auto d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-success font-mono">${fmt(p.price)} ${cur()}</span>
+            <button class="btn btn-sm btn-primary-app rounded-pill px-2.5" onclick="addToCart(${p.id})">
+              <i class="fas fa-cart-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const existing = cart.find(x => x.id === id);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ id: p.id, name: p.name, price: p.price, cost: p.cost, barcode: p.barcode, imei: p.imei, qty: 1 });
+  }
+  sv('rst_public_cart', cart);
+  updateCartBadge();
+  SoundEngine.beep();
+  toast(`Added ${p.name} to cart!`, 'success');
+}
+
+function updateCartBadge() {
+  const count = cart.reduce((s, i) => s + i.qty, 0);
+  const badge = document.getElementById('cartBadge');
+  if (badge) badge.textContent = count;
+}
+
+function openCartDrawer() {
+  SoundEngine.click();
+  const body = document.getElementById('cartDrawerBody');
+  if (!cart.length) {
+    body.innerHTML = `
+      <div class="text-center py-5 text-muted">
+        <i class="fas fa-shopping-cart fa-3x mb-3 text-secondary"></i>
+        <h6>Your cart is empty</h6>
+        <button class="btn btn-sm btn-success mt-2" onclick="showPublicPage('shop');bootstrap.Offcanvas.getInstance(document.getElementById('cartOffcanvas')).hide()">Explore Shop</button>
+      </div>
+    `;
+  } else {
+    const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+    const vat = subtotal * CONFIG.vatRate;
+    const total = subtotal + vat;
+
+    body.innerHTML = `
+      <div class="space-y-3 mb-3">
+        ${cart.map((item, idx) => `
+          <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-2">
+            <div>
+              <div class="fw-bold text-truncate" style="max-width:180px">${item.name}</div>
+              <small class="text-muted font-mono">${fmt(item.price)} ${cur()}</small>
+            </div>
+            <div class="d-flex align-items-center gap-1">
+              <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="changeCartQty(${idx}, -1)">-</button>
+              <span class="font-mono fw-bold px-1">${item.qty}</span>
+              <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="changeCartQty(${idx}, 1)">+</button>
+              <button class="btn btn-sm btn-link text-danger p-0 ms-1" onclick="removeCartItem(${idx})"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="bg-light p-3 rounded mb-3 small font-mono">
+        <div class="d-flex justify-content-between"><span>Subtotal:</span><span>${fmt(subtotal)} ${cur()}</span></div>
+        <div class="d-flex justify-content-between"><span>Oman VAT (5%):</span><span>${fmt(vat)} ${cur()}</span></div>
+        <hr class="my-1">
+        <div class="d-flex justify-content-between fw-bold text-success fs-6"><span>Grand Total:</span><span>${fmt(total)} ${cur()}</span></div>
+      </div>
+      <button class="btn btn-success w-100 py-2 fw-bold" onclick="checkoutPublicCart()">
+        <i class="fas fa-check-circle me-1"></i> Confirm & Generate Tax Invoice
+      </button>
+    `;
+  }
+  const drawer = new bootstrap.Offcanvas(document.getElementById('cartOffcanvas'));
+  drawer.show();
+}
+
+function changeCartQty(idx, delta) {
+  cart[idx].qty += delta;
+  if (cart[idx].qty <= 0) cart.splice(idx, 1);
+  sv('rst_public_cart', cart);
+  updateCartBadge();
+  openCartDrawer();
+}
+
+function removeCartItem(idx) {
+  cart.splice(idx, 1);
+  sv('rst_public_cart', cart);
+  updateCartBadge();
+  openCartDrawer();
+}
+
+function checkoutPublicCart() {
+  if (!cart.length) return;
+  const subtotal = cart.reduce((s, i) => s + (i.price * i.qty), 0);
+  const vat = subtotal * CONFIG.vatRate;
+  const grandTotal = subtotal + vat;
+  const invNo = `${CONFIG.invoice_prefix}-${String(invoices.length + 1).padStart(5, '0')}`;
+  const profit = cart.reduce((s, i) => s + ((i.price - i.cost) * i.qty), 0);
+
+  const inv = {
+    id: uid(),
+    invoice_no: invNo,
+    date: new Date().toISOString(),
+    customer: 'Walk-in / Online Store Customer',
+    items: [...cart],
+    subtotal, vat, grand_total: grandTotal,
+    profit, payment: 'Cash / Card', status: 'Paid',
+    branch: 'Mabellah Main Branch'
+  };
+
+  invoices.unshift(inv);
+  // Reduce stock
+  cart.forEach(item => {
+    const p = products.find(x => x.id === item.id);
+    if (p) p.stock = Math.max(0, p.stock - item.qty);
+  });
+  cart = [];
+  sv('rst_public_cart', cart);
+  saveAll();
+  updateCartBadge();
+
+  bootstrap.Offcanvas.getInstance(document.getElementById('cartOffcanvas'))?.hide();
+  toast(`Order Placed! Invoice: ${invNo}`, 'success');
+  alert(`✅ TAX INVOICE GENERATED!\nInvoice No: ${invNo}\nGrand Total: ${fmt(grandTotal)} ${cur()}\nThank you for choosing ${CONFIG.business_name}!`);
+}
+
+function renderTelecomPublic() {
+  const container = document.getElementById('telecomOperatorCards');
+  if (!container) return;
+  container.innerHTML = telecomOps.map(op => `
+    <div class="col-md-4">
+      <div class="card p-4 text-center h-100" style="border-top:4px solid ${op.color}">
+        <span class="badge text-white mx-auto mb-2" style="background:${op.color}">${op.code}</span>
+        <h5 class="fw-bold">${op.name}</h5>
+        <div class="small text-muted mb-3 font-mono">Gateway Ping: ${op.latency}ms</div>
+        <div class="input-group mb-3">
+          <span class="input-group-text"><i class="fas fa-mobile-alt"></i></span>
+          <input type="text" class="form-control" id="tel_phone_${op.id}" placeholder="+968 9xxx xxxx">
+        </div>
+        <div class="input-group mb-3">
+          <span class="input-group-text">${cur()}</span>
+          <input type="number" class="form-control" id="tel_amt_${op.id}" placeholder="e.g. 5.000" step="0.5">
+        </div>
+        <button class="btn btn-success fw-bold" onclick="instantRechargeOperator(${op.id})">
+          <i class="fas fa-bolt me-1"></i> Instant Top-Up
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function instantRechargeOperator(opId) {
+  const op = telecomOps.find(o => o.id === opId);
+  const phone = document.getElementById(`tel_phone_${opId}`).value.trim();
+  const amt = parseFloat(document.getElementById(`tel_amt_${opId}`).value) || 0;
+  if (!phone || amt <= 0) return toast('Please enter mobile number and amount!', 'error');
+
+  const profit = op.type === 'percent' ? (amt * op.margin / 100) : op.margin;
+  op.balance = Math.max(0, op.balance - amt);
+  saveAll();
+  SoundEngine.success();
+  toast(`Recharge Successful! ${op.name} ${phone}: ${fmt(amt)} ${cur()}`, 'success');
+  document.getElementById(`tel_phone_${opId}`).value = '';
+  document.getElementById(`tel_amt_${opId}`).value = '';
+}
+
+function renderUtilityPublic() {
+  const container = document.getElementById('utilityCards');
+  if (!container) return;
+  container.innerHTML = utilityOps.map(u => `
+    <div class="col-md-4">
+      <div class="card p-4 text-center h-100">
+        <i class="fas fa-${u.icon} fa-3x text-primary mb-3"></i>
+        <h5 class="fw-bold">${u.name}</h5>
+        <p class="text-muted small">Account verification & instant bill settlement</p>
+        <div class="input-group mb-2">
+          <input type="text" class="form-control" placeholder="Account / Meter Number">
+        </div>
+        <div class="input-group mb-3">
+          <span class="input-group-text">${cur()}</span>
+          <input type="number" class="form-control" placeholder="Bill Amount">
+        </div>
+        <button class="btn btn-outline-success" onclick="toast('Utility Bill Settled Successfully!','success')">Pay Now</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ==========================================
+// 6. SCIENCE SKILLS & KANBAN TASK ENGINE
+// ==========================================
+function renderScienceTasks() {
+  const stages = ['todo', 'in_progress', 'review', 'completed'];
+  stages.forEach(st => {
+    const listEl = document.getElementById('list-' + st);
+    const cntEl = document.getElementById('cnt-' + st);
+    if (!listEl) return;
+    const items = scienceTasks.filter(t => t.stage === st);
+    if (cntEl) cntEl.textContent = items.length;
+
+    listEl.innerHTML = items.map(t => `
+      <div class="task-card" onclick="viewScienceTaskDetail(${t.id})">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+          <span class="badge bg-dark badge-tag">${t.category}</span>
+          <span class="badge bg-${t.priority==='High'?'danger':t.priority==='Urgent'?'dark':'warning'} badge-tag">${t.priority}</span>
+        </div>
+        <h6 class="fw-bold mb-1" style="font-size:13px">${t.title}</h6>
+        <p class="text-muted small mb-2 text-truncate" style="font-size:11px">${t.hypothesis || 'No hypothesis set'}</p>
+        <div class="d-flex justify-content-between align-items-center pt-1 border-top" style="font-size:11px">
+          <span class="text-muted font-mono"><i class="fas fa-calendar-alt me-1"></i>${t.dueDate}</span>
+          <div class="btn-group btn-group-sm" onclick="event.stopPropagation()">
+            ${st !== 'completed' ? `<button class="btn btn-sm btn-outline-success py-0 px-1" title="Advance Stage" onclick="advanceTaskStage(${t.id})"><i class="fas fa-arrow-right"></i></button>` : ''}
+            <button class="btn btn-sm btn-outline-danger py-0 px-1" title="Delete" onclick="deleteScienceTask(${t.id})"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+      </div>
+    `).join('') || '<div class="text-center text-muted py-4 small">No tasks in this stage</div>';
+  });
+}
+
+function advanceTaskStage(id) {
+  const t = scienceTasks.find(x => x.id === id);
+  if (!t) return;
+  const stages = ['todo', 'in_progress', 'review', 'completed'];
+  const nextIdx = stages.indexOf(t.stage) + 1;
+  if (nextIdx < stages.length) {
+    t.stage = stages[nextIdx];
+    t.updatedAt = new Date().toISOString();
+    saveAll();
+    renderScienceTasks();
+    SoundEngine.beep();
+    toast(`Advanced task to "${t.stage}" stage`, 'info');
+  }
+}
+
+function deleteScienceTask(id) {
+  if (!confirm('Delete this science task?')) return;
+  scienceTasks = scienceTasks.filter(x => x.id !== id);
+  saveAll();
+  renderScienceTasks();
+  toast('Task removed', 'info');
+}
+
+function openNewScienceTaskModal() {
+  SoundEngine.click();
+  const m = new bootstrap.Modal(document.getElementById('scienceTaskModal'));
+  m.show();
+}
+
+function handleCreateScienceTask(e) {
+  e.preventDefault();
+  const title = document.getElementById('st_title').value.trim();
+  if (!title) return;
+
+  const newTask = {
+    id: uid(),
+    title,
+    category: document.getElementById('st_category').value,
+    stage: document.getElementById('st_stage').value,
+    priority: document.getElementById('st_priority').value,
+    dueDate: document.getElementById('st_duedate').value,
+    hypothesis: document.getElementById('st_hypothesis').value.trim(),
+    independentVar: document.getElementById('st_indep').value.trim(),
+    dependentVar: document.getElementById('st_dep').value.trim(),
+    controlVar: document.getElementById('st_control').value.trim(),
+    apparatus: document.getElementById('st_apparatus').value.trim(),
+    observations: 'Observation notes initiated.',
+    updatedAt: new Date().toISOString()
+  };
+
+  scienceTasks.unshift(newTask);
+  saveAll();
+  renderScienceTasks();
+  bootstrap.Modal.getInstance(document.getElementById('scienceTaskModal')).hide();
+  SoundEngine.success();
+  toast('✅ Science Task Created & Broadcasted Across Devices!', 'success');
+}
+
+function viewScienceTaskDetail(id) {
+  const t = scienceTasks.find(x => x.id === id);
+  if (!t) return;
+  alert(`🔬 SCIENCE TASK SPECIFICATION:\nTitle: ${t.title}\nCategory: ${t.category}\nPriority: ${t.priority}\nDue Date: ${t.dueDate}\n\nHypothesis: ${t.hypothesis}\nIndependent Var: ${t.independentVar}\nDependent Var: ${t.dependentVar}\nControl Var: ${t.controlVar}\nApparatus: ${t.apparatus}\nObservations: ${t.observations}`);
+}
+
+function calculateOhmsLaw() {
+  const v = parseFloat(document.getElementById('calcVolts').value);
+  const r = parseFloat(document.getElementById('calcOhms').value);
+  if (isNaN(v) || isNaN(r) || r === 0) return toast('Please enter valid Volts and Ohms', 'error');
+  const amps = v / r;
+  const watts = v * amps;
+  document.getElementById('ohmsLawResult').textContent = `Result: ${amps.toFixed(4)} Amps (A) • Power: ${watts.toFixed(4)} Watts (W)`;
+  SoundEngine.beep();
+}
+
+function askAiScienceMethod() {
+  toggleAiModal();
+  setAiMode('think');
+  document.getElementById('aiChatInput').value = 'Provide a structured scientific experimental method for electronics testing and failure analysis.';
+  sendAiQuery();
+}
+
+// ==========================================
+// 7. GEMINI AI CLIENT (3 DISTINCT MODES)
+// ==========================================
+let currentAiMode = 'flash'; // 'flash' (gemini-3.1-flash-lite), 'video' (gemini-3.1-pro-preview), 'think' (gemini-3.1-pro-preview + HIGH)
+
+function toggleAiModal() {
+  SoundEngine.click();
+  document.getElementById('aiModal').classList.toggle('open');
+}
+
+function setAiMode(mode) {
+  currentAiMode = mode;
+  ['flash', 'video', 'think'].forEach(m => {
+    document.getElementById(`btn-mode-${m}`).classList.toggle('active', m === mode);
+  });
+  const desc = document.getElementById('aiModeDescription');
+  const videoPanel = document.getElementById('aiVideoInputPanel');
+
+  if (mode === 'flash') {
+    desc.innerHTML = 'Mode: <strong>Low-Latency (gemini-3.1-flash-lite)</strong> for immediate quick answers.';
+    videoPanel.style.display = 'none';
+  } else if (mode === 'video') {
+    desc.innerHTML = 'Mode: <strong>Video Understanding (gemini-3.1-pro-preview)</strong> to analyze video content.';
+    videoPanel.style.display = 'block';
+  } else if (mode === 'think') {
+    desc.innerHTML = 'Mode: <strong>High Thinking (gemini-3.1-pro-preview, thinkingLevel HIGH)</strong> for complex scientific reasoning.';
+    videoPanel.style.display = 'none';
+  }
+}
+
+function addAiMessage(role, text) {
+  const container = document.getElementById('aiChatMessages');
+  const d = document.createElement('div');
+  d.className = `p-2 rounded mb-2 small ${role==='user'?'bg-success text-white ms-auto':'bg-white border text-dark'}`;
+  d.style.maxWidth = '88%';
+  d.innerHTML = `<strong>${role==='user'?'You':'Gemini AI'}:</strong><br>${text.replace(/\n/g, '<br>')}`;
+  container.appendChild(d);
+  container.scrollTop = container.scrollHeight;
+}
+
+window.handleNativeAiResponse = function(response) {
+  const typing = document.getElementById('aiTypingIndicator');
+  if (typing) typing.remove();
+  addAiMessage('model', response);
+  SoundEngine.success();
+};
+
+function sendAiQuery() {
+  const input = document.getElementById('aiChatInput');
+  const query = input.value.trim();
+  if (!query) return;
+
+  SoundEngine.click();
+  addAiMessage('user', query);
+  input.value = '';
+
+  const container = document.getElementById('aiChatMessages');
+  const typing = document.createElement('div');
+  typing.id = 'aiTypingIndicator';
+  typing.className = 'text-muted small p-2';
+  typing.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i> Gemini (${currentAiMode}) thinking...`;
+  container.appendChild(typing);
+  container.scrollTop = container.scrollHeight;
+
+  // If running inside Android with native WebAppInterface bridge
+  if (window.AndroidBridge) {
+    if (currentAiMode === 'flash') {
+      window.AndroidBridge.requestLowLatencyAi(query, 'handleNativeAiResponse');
+      return;
+    } else if (currentAiMode === 'video') {
+      const videoUrl = document.getElementById('aiVideoUrl')?.value.trim() || '';
+      const promptWithVideo = videoUrl ? `[Video Reference: ${videoUrl}] ${query}` : query;
+      window.AndroidBridge.requestVideoAnalysis(promptWithVideo, '', 'video/mp4', 'handleNativeAiResponse');
+      return;
+    } else if (currentAiMode === 'think') {
+      window.AndroidBridge.requestHighThinkingAi(query, 'handleNativeAiResponse');
+      return;
+    }
+  }
+
+  // Web browser mode: Call server backend Gemini endpoints directly
+  let endpoint = '/api/gemini/chat';
+  let bodyPayload = { prompt: query };
+
+  if (currentAiMode === 'video') {
+    endpoint = '/api/gemini/video';
+    const videoUrl = document.getElementById('aiVideoUrl')?.value.trim() || '';
+    bodyPayload = { prompt: videoUrl ? `[Video Reference: ${videoUrl}] ${query}` : query };
+  } else if (currentAiMode === 'think') {
+    endpoint = '/api/gemini/think';
+    bodyPayload = { prompt: query };
+  }
+
+  fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(bodyPayload)
+  })
+    .then(r => r.json())
+    .then(data => {
+      window.handleNativeAiResponse(data.reply || 'No response generated.');
+    })
+    .catch(err => {
+      window.handleNativeAiResponse(`Notice: ${err.message}`);
+    });
+}
+
+// ==========================================
+// 8. ADMIN ERP NAVIGATION & MODULES
+// ==========================================
+function showAdminLoginModal() {
+  SoundEngine.click();
+  const m = new bootstrap.Modal(document.getElementById('loginModal'));
+  m.show();
+}
+
+function handleAdminLogin(e) {
+  e.preventDefault();
+  const u = document.getElementById('loginUsername').value.trim();
+  const p = document.getElementById('loginPassword').value.trim();
+  if (p === '123') {
+    currentUser = { username: u, role: u === 'admin' ? 'admin' : u === 'dealer' ? 'dealer' : 'staff' };
+    bootstrap.Modal.getInstance(document.getElementById('loginModal')).hide();
+    document.getElementById('publicApp').style.display = 'none';
+    document.getElementById('adminApp').style.display = 'block';
+    document.getElementById('adminUserBadge').textContent = `User: ${u} (${currentUser.role})`;
+    SoundEngine.success();
+    toast(`Welcome ${u}! Enterprise ERP Ready.`, 'success');
+    navigateAdmin('dashboard');
+  } else {
+    toast('Invalid PIN / Credentials!', 'error');
+  }
+}
+
+function exitAdminToPublic() {
+  SoundEngine.click();
+  document.getElementById('adminApp').style.display = 'none';
+  document.getElementById('publicApp').style.display = 'block';
+}
+
+function logoutAdmin() {
+  currentUser = null;
+  exitAdminToPublic();
+  toast('Logged out successfully', 'info');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+const adminPages = {};
+
+function navigateAdmin(page) {
+  SoundEngine.click();
+  document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
+  document.querySelector(`.sidebar .nav-link[data-admin-page="${page}"]`)?.classList.add('active');
+  const container = document.getElementById('adminPageContainer');
+  const renderFn = adminPages[page] || adminPages.dashboard;
+  container.innerHTML = renderFn();
+  if (window.innerWidth < 992) document.getElementById('sidebar').classList.remove('open');
+  if (page === 'dashboard') initAdminDashboardCharts();
+}
+
+document.querySelectorAll('.sidebar .nav-link[data-admin-page]').forEach(el => {
+  el.addEventListener('click', () => navigateAdmin(el.dataset.adminPage));
+});
+
+// Admin Page: Dashboard
+adminPages.dashboard = () => {
+  const totalSales = invoices.reduce((s, i) => s + i.grand_total, 0);
+  const totalProfit = invoices.reduce((s, i) => s + i.profit, 0);
+  const stockVal = products.reduce((s, p) => s + (p.cost * p.stock), 0);
+  const telecomBal = telecomOps.reduce((s, o) => s + o.balance, 0);
+
+  return `
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-3">
+        <div class="card p-3 bg-primary-app">
+          <small class="opacity-75">Total Sales Revenue</small>
+          <h4 class="fw-bold font-mono my-1">${fmt(totalSales)} ${cur()}</h4>
+          <small class="opacity-75">${invoices.length} Tax Invoices</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card p-3 bg-success text-white">
+          <small class="opacity-75">Net Retail Profit</small>
+          <h4 class="fw-bold font-mono my-1">${fmt(totalProfit)} ${cur()}</h4>
+          <small class="opacity-75">VAT 5% Compliant</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card p-3 bg-warning text-dark">
+          <small class="text-muted">Stock Valuation</small>
+          <h4 class="fw-bold font-mono my-1">${fmt(stockVal)} ${cur()}</h4>
+          <small class="text-muted">${products.length} SKUs Tracked</small>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div class="card p-3 bg-info text-white">
+          <small class="opacity-75">Oman Telecom Pool</small>
+          <h4 class="fw-bold font-mono my-1">${fmt(telecomBal)} ${cur()}</h4>
+          <small class="opacity-75">6 Operators Active</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+      <div class="col-lg-8">
+        <div class="card p-3">
+          <h6 class="fw-bold mb-3"><i class="fas fa-chart-bar me-1"></i> Revenue & Net Margin Analysis</h6>
+          <canvas id="adminSalesChart" height="110"></canvas>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card p-3 h-100">
+          <h6 class="fw-bold mb-3"><i class="fas fa-bolt text-warning me-1"></i> Quick ERP Actions</h6>
+          <div class="d-grid gap-2">
+            <button class="btn btn-primary-app btn-sm py-2" onclick="navigateAdmin('pos')"><i class="fas fa-cash-register me-1"></i> New POS Bill</button>
+            <button class="btn btn-outline-dark btn-sm py-2" onclick="navigateAdmin('addItem')"><i class="fas fa-plus me-1"></i> Add Item (Sorol Hisab)</button>
+            <button class="btn btn-outline-success btn-sm py-2" onclick="navigateAdmin('scienceTasks')"><i class="fas fa-flask me-1"></i> Science Tasks & Realtime Sync</button>
+            <button class="btn btn-outline-info btn-sm py-2" onclick="navigateAdmin('languageEditor')"><i class="fas fa-language me-1"></i> Language Editor (BN/EN/AR)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+function initAdminDashboardCharts() {
+  const canvas = document.getElementById('adminSalesChart');
+  if (!canvas) return;
+  new Chart(canvas, {
+    type: 'bar',
+    data: {
+      labels: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+      datasets: [
+        { label: 'Revenue (OMR)', data: [180, 240, 310, 195, 420, 510, 380], backgroundColor: '#1e7e34' },
+        { label: 'Profit (OMR)', data: [45, 62, 78, 51, 105, 128, 94], backgroundColor: '#fbbf24' }
+      ]
+    },
+    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+  });
+}
+
+// Admin Page: POS
+let adminCart = [];
+adminPages.pos = () => {
+  return `
+    <div class="row g-3">
+      <div class="col-lg-7">
+        <div class="card p-3 mb-3">
+          <div class="d-flex gap-2 mb-2">
+            <input type="text" id="posBarcodeSearch" class="form-control form-control-sm font-mono" placeholder="Scan Barcode / IMEI or type name..." onkeypress="if(event.key==='Enter')searchPosBarcode(this.value)">
+            <button class="btn btn-sm btn-dark" onclick="openScannerModal('pos')"><i class="fas fa-camera"></i></button>
+          </div>
+          <div class="row g-2 max-h-48 overflow-y-auto" id="posProductSelector">
+            ${products.map(p => `
+              <div class="col-4">
+                <button class="btn btn-sm btn-outline-secondary w-100 text-start p-2" onclick="addToAdminPosCart(${p.id})">
+                  <div class="fw-bold text-truncate" style="font-size:11px">${p.name}</div>
+                  <div class="text-success font-mono" style="font-size:10px">${fmt(p.price)} ${cur()}</div>
+                  <span class="badge bg-light text-dark" style="font-size:9px">Stock: ${p.stock}</span>
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        <div class="card p-3">
+          <table class="table table-sm text-center align-middle" style="font-size:12px">
+            <thead class="table-light"><tr><th>Item</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead>
+            <tbody id="adminCartTable"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="col-lg-5">
+        <div class="card p-3 bg-light">
+          <h6 class="fw-bold mb-2">Tax Invoice Settlement</h6>
+          <div class="mb-2">
+            <label class="small text-muted">Customer</label>
+            <input type="text" id="posCustName" class="form-control form-control-sm" value="Walk-in Customer">
+          </div>
+          <div class="mb-2">
+            <label class="small text-muted">Payment Mode</label>
+            <select id="posPayMode" class="form-select form-select-sm">
+              <option>Cash (OMR)</option>
+              <option>Card (Visa/Master)</option>
+              <option>Bank Muscat</option>
+              <option>VIP Credit Ledger</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="small text-muted">Discount (${cur()})</label>
+            <input type="number" id="posDiscountVal" class="form-control form-control-sm" value="0.000" onchange="renderAdminPosCart()">
+          </div>
+          <div class="bg-white p-3 rounded border font-mono small space-y-1 mb-3">
+            <div class="d-flex justify-content-between"><span>Subtotal:</span><span id="posSubtotalDisp">0.000</span></div>
+            <div class="d-flex justify-content-between"><span>Oman VAT (5%):</span><span id="posVatDisp">0.000</span></div>
+            <div class="d-flex justify-content-between fw-bold text-success fs-5"><span>Net Total:</span><span id="posNetDisp">0.000</span></div>
+          </div>
+          <button class="btn btn-success w-100 py-2.5 fw-bold" onclick="completeAdminPosSale()">
+            <i class="fas fa-print me-1"></i> Save & Print Tax Invoice
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+function addToAdminPosCart(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const existing = adminCart.find(x => x.id === id);
+  if (existing) {
+    existing.qty++;
+  } else {
+    adminCart.push({ id: p.id, name: p.name, price: p.price, cost: p.cost, barcode: p.barcode, imei: p.imei, qty: 1 });
+  }
+  SoundEngine.beep();
+  renderAdminPosCart();
+}
+
+function renderAdminPosCart() {
+  const tbody = document.getElementById('adminCartTable');
+  if (!tbody) return;
+  tbody.innerHTML = adminCart.map((item, idx) => `
+    <tr>
+      <td class="text-start">${item.name}</td>
+      <td class="font-mono">${fmt(item.price)}</td>
+      <td><input type="number" class="form-control form-control-sm text-center mx-auto" style="width:50px" value="${item.qty}" onchange="adminCart[${idx}].qty=Math.max(1,parseInt(this.value)||1);renderAdminPosCart()"></td>
+      <td class="font-mono fw-bold text-success">${fmt(item.price * item.qty)}</td>
+      <td><button class="btn btn-sm btn-link text-danger p-0" onclick="adminCart.splice(${idx},1);renderAdminPosCart()"><i class="fas fa-times"></i></button></td>
+    </tr>
+  `).join('') || '<tr><td colspan="5" class="text-muted py-3">Scan item to begin bill</td></tr>';
+
+  const subtotal = adminCart.reduce((s, i) => s + (i.price * i.qty), 0);
+  const disc = parseFloat(document.getElementById('posDiscountVal')?.value) || 0;
+  const taxable = Math.max(0, subtotal - disc);
+  const vat = taxable * CONFIG.vatRate;
+  const net = taxable + vat;
+
+  document.getElementById('posSubtotalDisp').textContent = `${fmt(subtotal)} ${cur()}`;
+  document.getElementById('posVatDisp').textContent = `${fmt(vat)} ${cur()}`;
+  document.getElementById('posNetDisp').textContent = `${fmt(net)} ${cur()}`;
+}
+
+function searchPosBarcode(code) {
+  const p = products.find(x => x.barcode === code || x.imei === code || x.name.toLowerCase().includes(code.toLowerCase()));
+  if (p) {
+    addToAdminPosCart(p.id);
+    document.getElementById('posBarcodeSearch').value = '';
+    toast(`Scanned: ${p.name}`, 'success');
+  } else {
+    toast(`Barcode/IMEI ${code} not found!`, 'error');
+  }
+}
+
+function completeAdminPosSale() {
+  if (!adminCart.length) return toast('Cart is empty!', 'error');
+  const subtotal = adminCart.reduce((s, i) => s + (i.price * i.qty), 0);
+  const disc = parseFloat(document.getElementById('posDiscountVal')?.value) || 0;
+  const vat = (subtotal - disc) * CONFIG.vatRate;
+  const net = (subtotal - disc) + vat;
+  const invNo = `${CONFIG.invoice_prefix}-${String(invoices.length + 1).padStart(5, '0')}`;
+  const profit = adminCart.reduce((s, i) => s + ((i.price - i.cost) * i.qty), 0) - disc;
+
+  const inv = {
+    id: uid(),
+    invoice_no: invNo,
+    date: new Date().toISOString(),
+    customer: document.getElementById('posCustName')?.value || 'Customer',
+    items: [...adminCart],
+    subtotal, discount: disc, vat, grand_total: net,
+    profit, payment: document.getElementById('posPayMode')?.value || 'Cash',
+    status: 'Paid', branch: 'Mabellah Main Branch'
+  };
+
+  invoices.unshift(inv);
+  adminCart.forEach(item => {
+    const p = products.find(x => x.id === item.id);
+    if (p) p.stock = Math.max(0, p.stock - item.qty);
+  });
+  adminCart = [];
+  saveAll();
+  renderAdminPosCart();
+  SoundEngine.success();
+  toast(`Invoice ${invNo} Generated!`, 'success');
+  alert(`RST TAX INVOICE:\nNo: ${invNo}\nAmount: ${fmt(net)} ${cur()}\nCustomer: ${inv.customer}`);
+}
+
+// Admin Page: Science Tasks
+adminPages.scienceTasks = () => {
+  return `
+    <div class="card p-3 mb-3">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h5 class="fw-bold mb-0"><i class="fas fa-flask text-success me-2"></i>Science & Laboratory Task Tracker</h5>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-primary-app" onclick="openNewScienceTaskModal()"><i class="fas fa-plus me-1"></i> New Science Task</button>
+          <button class="btn btn-sm btn-outline-success" onclick="broadcastTaskSync()"><i class="fas fa-sync-alt me-1"></i> Sync Across Devices</button>
+        </div>
+      </div>
+    </div>
+    <div class="kanban-board">
+      <div class="kanban-col" id="col-todo-admin">
+        <div class="kanban-col-header text-secondary"><span>To Do</span></div>
+        <div class="task-list" id="list-todo-admin"></div>
+      </div>
+      <div class="kanban-col" id="col-in_progress-admin">
+        <div class="kanban-col-header text-primary"><span>In Progress</span></div>
+        <div class="task-list" id="list-in_progress-admin"></div>
+      </div>
+      <div class="kanban-col" id="col-review-admin">
+        <div class="kanban-col-header text-warning"><span>Review</span></div>
+        <div class="task-list" id="list-review-admin"></div>
+      </div>
+      <div class="kanban-col" id="col-completed-admin">
+        <div class="kanban-col-header text-success"><span>Completed</span></div>
+        <div class="task-list" id="list-completed-admin"></div>
+      </div>
+    </div>
+  `;
+};
+
+// Admin Page: Add Item (Sorol Hisab specifications)
+adminPages.addItem = () => {
+  return `
+    <div class="card p-4">
+      <h5 class="fw-bold mb-3 border-bottom pb-2">➕ Add New Item (Sorol Hisab Format)</h5>
+      <form onsubmit="handleAdminAddItem(event)">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Barcode (EAN-13 / Code128) *</label>
+            <div class="input-group">
+              <input type="text" id="ai_barcode" class="form-control font-mono" required value="890${Date.now().toString().slice(-10)}">
+              <button type="button" class="btn btn-outline-dark" onclick="document.getElementById('ai_barcode').value='890'+Date.now().toString().slice(-10)"><i class="fas fa-random"></i> Auto</button>
+              <button type="button" class="btn btn-dark" onclick="openScannerModal('addItem')"><i class="fas fa-camera"></i> Scan</button>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label fw-bold">Item Name *</label>
+            <input type="text" id="ai_name" class="form-control" required placeholder="e.g. Walton High-Speed Ceiling Fan">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Category</label>
+            <select id="ai_cat" class="form-select">
+              <option>Mobile</option><option>TV</option><option>Laptop</option><option>Audio</option><option>Appliances</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Brand / Company</label>
+            <input type="text" id="ai_brand" class="form-control" value="Walton">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-bold">Unit</label>
+            <select id="ai_unit" class="form-select"><option>Pcs</option><option>Box</option><option>Set</option></select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-bold">Purchase Cost (${cur()}) *</label>
+            <input type="number" step="0.001" id="ai_cost" class="form-control font-mono" required value="10.000">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-bold">Sales Price (${cur()}) *</label>
+            <input type="number" step="0.001" id="ai_price" class="form-control font-mono" required value="14.500">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-bold">Opening Stock *</label>
+            <input type="number" id="ai_stock" class="form-control font-mono" required value="10">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label fw-bold">15-Digit IMEI</label>
+            <input type="text" id="ai_imei" class="form-control font-mono" placeholder="Optional IMEI">
+          </div>
+        </div>
+        <div class="mt-4 pt-2 border-top">
+          <button type="submit" class="btn btn-success fw-bold px-4"><i class="fas fa-save me-1"></i> Save Item to Cloud Database</button>
+        </div>
+      </form>
+    </div>
+  `;
+};
+
+function handleAdminAddItem(e) {
+  e.preventDefault();
+  const name = document.getElementById('ai_name').value.trim();
+  const price = parseFloat(document.getElementById('ai_price').value) || 0;
+  const cost = parseFloat(document.getElementById('ai_cost').value) || 0;
+  const stock = parseInt(document.getElementById('ai_stock').value) || 0;
+  const barcode = document.getElementById('ai_barcode').value.trim();
+  const imei = document.getElementById('ai_imei').value.trim();
+  const cat = document.getElementById('ai_cat').value;
+  const brand = document.getElementById('ai_brand').value;
+
+  const newItem = {
+    id: uid(),
+    name, price, cost, stock, barcode, imei,
+    category: cat, brand, icon: '📦', featured: true
+  };
+
+  products.unshift(newItem);
+  saveAll();
+  SoundEngine.success();
+  toast(`Item "${name}" saved!`, 'success');
+  navigateAdmin('items');
+}
+
+// Admin Page: Items List
+adminPages.items = () => {
+  return `
+    <div class="card p-3">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="fw-bold mb-0">Items & IMEI Inventory Stock (${products.length})</h5>
+        <button class="btn btn-sm btn-primary-app" onclick="navigateAdmin('addItem')"><i class="fas fa-plus me-1"></i> Add Item</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover table-sm align-middle" style="font-size:12px">
+          <thead class="table-light">
+            <tr><th>Name</th><th>Category</th><th>Barcode</th><th>IMEI</th><th>Cost</th><th>Price</th><th>Stock</th><th>Action</th></tr>
+          </thead>
+          <tbody>
+            ${products.map((p, idx) => `
+              <tr>
+                <td><strong>${p.name}</strong><br><small class="text-muted">${p.brand}</small></td>
+                <td><span class="badge bg-light text-dark">${p.category}</span></td>
+                <td><code class="font-mono">${p.barcode}</code></td>
+                <td><code class="font-mono text-muted">${p.imei || '-'}</code></td>
+                <td class="font-mono">${fmt(p.cost)}</td>
+                <td class="font-mono fw-bold text-success">${fmt(p.price)}</td>
+                <td><span class="badge bg-${p.stock>5?'success':'danger'} font-mono">${p.stock}</span></td>
+                <td>
+                  <button class="btn btn-sm btn-outline-danger p-1" onclick="products.splice(${idx},1);saveAll();navigateAdmin('items')"><i class="fas fa-trash"></i></button>
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+};
+
+// Admin Page: Barcode Studio
+adminPages.barcodeStudio = () => {
+  return `
+    <div class="card p-4">
+      <h5 class="fw-bold mb-3">🔲 Barcode Studio & Label Generator</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-bold">Enter Text or Numbers to Encode:</label>
+          <div class="input-group mb-3">
+            <input type="text" id="customBarcodeInput" class="form-control font-mono" value="8901234567890">
+            <button class="btn btn-dark" onclick="generateBarcodeSvg()"><i class="fas fa-sync-alt"></i> Generate</button>
+          </div>
+          <div class="d-flex gap-2 mb-3">
+            <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('customBarcodeInput').value='890'+Date.now().toString().slice(-10);generateBarcodeSvg()">EAN-13 Sample</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('customBarcodeInput').value='SN-RST-'+Date.now().toString(36).toUpperCase();generateBarcodeSvg()">Serial Sample</button>
+          </div>
+        </div>
+        <div class="col-md-6 text-center">
+          <div class="p-3 bg-light rounded border">
+            <svg id="barcodeCanvas"></svg>
+          </div>
+          <button class="btn btn-sm btn-outline-dark mt-2" onclick="window.print()"><i class="fas fa-print me-1"></i> Print Label</button>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+function generateBarcodeSvg() {
+  const val = document.getElementById('customBarcodeInput')?.value || '8901234567890';
+  try {
+    JsBarcode("#barcodeCanvas", val, { format: "CODE128", width: 2, height: 60, displayValue: true });
+    SoundEngine.beep();
+  } catch(e) {
+    toast('Error generating barcode', 'error');
+  }
+}
+
+// Admin Page: Language Editor
+adminPages.languageEditor = () => {
+  const keys = Object.keys(DEFAULT_STRINGS.en);
+  return `
+    <div class="card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <div>
+          <h5 class="fw-bold mb-0"><i class="fas fa-language text-primary me-2"></i>Live Multi-Language Dictionary Editor</h5>
+          <small class="text-muted">Edit Bengali (BN), English (EN), and Arabic (AR) strings live across the ERP.</small>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-sm btn-success fw-bold" onclick="saveLanguageEdits()"><i class="fas fa-save me-1"></i> Save All Edits</button>
+          <button class="btn btn-sm btn-outline-warning" onclick="resetLanguageDefaults()"><i class="fas fa-redo me-1"></i> Reset to Defaults</button>
+        </div>
+      </div>
+      <div class="table-responsive" style="max-height:550px">
+        <table class="table table-bordered table-sm align-middle" style="font-size:12px">
+          <thead class="table-dark sticky-top">
+            <tr><th style="width:180px">Key</th><th>🇬🇧 English</th><th>🇧🇩 বাংলা (Bengali)</th><th>🇸🇦 العربية (Arabic)</th></tr>
+          </thead>
+          <tbody>
+            ${keys.map(k => `
+              <tr>
+                <td><code>${k}</code></td>
+                <td><input type="text" class="form-control form-control-sm lang-input" data-lang="en" data-key="${k}" value="${STRINGS.en?.[k] || ''}"></td>
+                <td><input type="text" class="form-control form-control-sm lang-input" data-lang="bn" data-key="${k}" value="${STRINGS.bn?.[k] || ''}"></td>
+                <td><input type="text" class="form-control form-control-sm lang-input" data-lang="ar" data-key="${k}" value="${STRINGS.ar?.[k] || ''}"></td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  `;
+};
+
+function saveLanguageEdits() {
+  document.querySelectorAll('.lang-input').forEach(input => {
+    const l = input.dataset.lang;
+    const k = input.dataset.key;
+    if (!STRINGS[l]) STRINGS[l] = {};
+    STRINGS[l][k] = input.value;
+  });
+  sv('rst_editable_strings', STRINGS);
+  SoundEngine.success();
+  toast('✅ All Languages Saved Successfully!', 'success');
+  setLanguage(currentLang);
+}
+
+function resetLanguageDefaults() {
+  if (!confirm('Reset all language strings to default?')) return;
+  STRINGS = JSON.parse(JSON.stringify(DEFAULT_STRINGS));
+  sv('rst_editable_strings', STRINGS);
+  toast('Reset to factory language strings', 'info');
+  navigateAdmin('languageEditor');
+  setLanguage(currentLang);
+}
+
+// Admin Page: Lifetime Backup & Restore
+adminPages.backup = () => {
+  return `
+    <div class="card p-4">
+      <h5 class="fw-bold mb-3"><i class="fas fa-database text-primary me-2"></i>Lifetime Backup & Offline Cloud Restore</h5>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="card p-3 border-success text-center">
+            <i class="fas fa-cloud-download-alt text-success fa-3x mb-2"></i>
+            <h6 class="fw-bold">Export Full Database (.JSON)</h6>
+            <p class="small text-muted">Downloads products, sales invoices, science tasks, telecom balances, and language dictionaries.</p>
+            <button class="btn btn-success fw-bold" onclick="downloadFullBackup()"><i class="fas fa-download me-1"></i> Download JSON Backup</button>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card p-3 border-danger text-center">
+            <i class="fas fa-cloud-upload-alt text-danger fa-3x mb-2"></i>
+            <h6 class="fw-bold">Restore Database (.JSON)</h6>
+            <p class="small text-muted">Upload a valid backup file to instantly recover all records and settings.</p>
+            <input type="file" id="backupFileInput" class="form-control form-control-sm mb-2" accept=".json">
+            <button class="btn btn-danger fw-bold" onclick="restoreFullBackup()"><i class="fas fa-upload me-1"></i> Restore System</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+function downloadFullBackup() {
+  const fullData = {
+    products, telecomOps, utilityOps, scienceTasks, invoices, STRINGS, CONFIG, exportedAt: new Date().toISOString()
+  };
+  const blob = new Blob([JSON.stringify(fullData, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `RST_ERP_Backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  SoundEngine.success();
+  toast('Backup downloaded successfully', 'success');
+}
+
+function restoreFullBackup() {
+  const file = document.getElementById('backupFileInput')?.files[0];
+  if (!file) return toast('Please select a JSON file first!', 'error');
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.products) products = data.products;
+      if (data.telecomOps) telecomOps = data.telecomOps;
+      if (data.scienceTasks) scienceTasks = data.scienceTasks;
+      if (data.invoices) invoices = data.invoices;
+      if (data.STRINGS) STRINGS = data.STRINGS;
+      saveAll();
+      SoundEngine.success();
+      toast('System Restored Successfully!', 'success');
+      setTimeout(() => location.reload(), 1000);
+    } catch(err) {
+      toast('Invalid JSON backup file!', 'error');
+    }
+  };
+  reader.readAsText(file);
+}
+
+// Scanner tool
+let html5QrScanner = null;
+let currentScannerTarget = 'pos';
+
+function openScannerModal(target='pos') {
+  currentScannerTarget = target;
+  const m = new bootstrap.Modal(document.getElementById('scannerModal'));
+  m.show();
+  setTimeout(() => {
+    try {
+      if (html5QrScanner) html5QrScanner.clear();
+      html5QrScanner = new Html5Qrcode("scannerReader");
+      html5QrScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 220, height: 180 } },
+        (decodedText) => {
+          SoundEngine.beep();
+          applyScannedBarcode(decodedText);
+          stopScanner();
+          bootstrap.Modal.getInstance(document.getElementById('scannerModal')).hide();
+        },
+        () => {}
+      ).catch(() => {});
+    } catch(e){}
+  }, 350);
+}
+
+function stopScanner() {
+  if (html5QrScanner) {
+    html5QrScanner.stop().then(() => html5QrScanner.clear()).catch(()=>{});
+    html5QrScanner = null;
+  }
+}
+
+function submitManualScanner() {
+  const v = document.getElementById('manualScannerInput').value.trim();
+  if (v) {
+    applyScannedBarcode(v);
+    bootstrap.Modal.getInstance(document.getElementById('scannerModal')).hide();
+  }
+}
+
+function applyScannedBarcode(code) {
+  if (currentScannerTarget === 'pos') {
+    searchPosBarcode(code);
+  } else if (currentScannerTarget === 'addItem') {
+    const el = document.getElementById('ai_barcode');
+    if (el) el.value = code;
+  }
+}
+
+// ==========================================
+// 9. INIT
+// ==========================================
+window.onload = function() {
+  setLanguage(currentLang);
+  renderPublicProducts();
+  updateCartBadge();
+  initCloudStreamSync();
+  // Fetch initial cloud state
+  fetch('/api/state')
+    .then(r => r.json())
+    .then(data => {
+      if (data.products && data.products.length) products = data.products;
+      if (data.telecomOps && data.telecomOps.length) telecomOps = data.telecomOps;
+      if (data.scienceTasks && data.scienceTasks.length) scienceTasks = data.scienceTasks;
+      if (data.invoices && data.invoices.length) invoices = data.invoices;
+      renderPublicProducts();
+      renderScienceTasks();
+    })
+    .catch(() => {});
+};
+</script>
 </body>
 </html>

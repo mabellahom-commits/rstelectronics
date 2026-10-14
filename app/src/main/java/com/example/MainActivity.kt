@@ -33,7 +33,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.bridge.WebAppInterface
-import com.example.ui.theme.MyApplicationTheme
+import com.example.ui.theme.SciSyncTheme
 
 class MainActivity : ComponentActivity() {
 
@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MyApplicationTheme {
+            SciSyncTheme {
                 Surface(
                     modifier = Modifier
                         .fillMaxSize()

@@ -743,12 +743,20 @@ function saveAll() {
   sv('rst_science_tasks', scienceTasks);
   sv('rst_invoices', invoices);
   broadcastTaskSync();
+  // Sync to Cloud Server
+  try {
+    fetch('/api/state/sync', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ products, telecomOps, utilityOps, scienceTasks, invoices, STRINGS })
+    }).catch(() => {});
+  } catch (e) {}
 }
 
 // ==========================================
 // 4. REAL-TIME MULTI-DEVICE SYNC ENGINE
 // ==========================================
-// Uses Web BroadcastChannel + Storage Event for instant multi-device / multi-tab synchronization
+// Uses Web BroadcastChannel + Server-Sent Events (SSE) for instant multi-device synchronization
 const syncChannel = new BroadcastChannel('rst_sync_channel');
 
 syncChannel.onmessage = (event) => {
@@ -758,8 +766,8 @@ syncChannel.onmessage = (event) => {
     invoices = ls('rst_invoices', invoices);
     renderScienceTasks();
     renderPublicProducts();
-    if (document.getElementById('adminApp').style.display === 'block') {
-      renderAdminDashboard();
+    if (document.getElementById('adminApp')?.style.display === 'block') {
+      adminPages.dashboard && navigateAdmin('dashboard');
     }
   }
 };
@@ -770,6 +778,26 @@ window.addEventListener('storage', (e) => {
     renderScienceTasks();
   }
 });
+
+// Connect to Server-Sent Events (SSE) for real-time cloud device sync
+function initCloudStreamSync() {
+  try {
+    const evtSource = new EventSource('/api/stream');
+    evtSource.addEventListener('state_updated', () => {
+      fetch('/api/state')
+        .then(r => r.json())
+        .then(data => {
+          if (data.scienceTasks) scienceTasks = data.scienceTasks;
+          if (data.products) products = data.products;
+          if (data.invoices) invoices = data.invoices;
+          renderScienceTasks();
+          renderPublicProducts();
+          toast('⚡ Real-time cloud sync received from another device!', 'info');
+        })
+        .catch(() => {});
+    });
+  } catch (e) {}
+}
 
 function broadcastTaskSync() {
   sv('rst_science_tasks', scienceTasks);
@@ -1214,19 +1242,31 @@ function sendAiQuery() {
     }
   }
 
-  // Fallback direct REST or simulated high intelligence response
-  setTimeout(() => {
-    let response = '';
-    if (currentAiMode === 'flash') {
-      response = `⚡ [gemini-3.1-flash-lite Low-Latency Response]:\nProcessed in 120ms. Query: "${query}". Analysis: Recommended action logged for fast execution.`;
-    } else if (currentAiMode === 'video') {
-      const vUrl = document.getElementById('aiVideoUrl')?.value || 'local upload';
-      response = `🎥 [gemini-3.1-pro-preview Video Understanding]:\nAnalyzed footage (${vUrl}). Key frames show operational steps completed, no safety deviations found, and experiment readings are nominal.`;
-    } else if (currentAiMode === 'think') {
-      response = `🧠 [gemini-3.1-pro-preview High Thinking Mode]:\nDeep reasoning trace: Decomposed hypothesis into boundary conditions. The multi-variable interaction between thermal flux and component resistance verifies the expected coefficient. Recommended next step: run 3 corroborating trials.`;
-    }
-    window.handleNativeAiResponse(response);
-  }, 1000);
+  // Web browser mode: Call server backend Gemini endpoints directly
+  let endpoint = '/api/gemini/chat';
+  let bodyPayload = { prompt: query };
+
+  if (currentAiMode === 'video') {
+    endpoint = '/api/gemini/video';
+    const videoUrl = document.getElementById('aiVideoUrl')?.value.trim() || '';
+    bodyPayload = { prompt: videoUrl ? `[Video Reference: ${videoUrl}] ${query}` : query };
+  } else if (currentAiMode === 'think') {
+    endpoint = '/api/gemini/think';
+    bodyPayload = { prompt: query };
+  }
+
+  fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(bodyPayload)
+  })
+    .then(r => r.json())
+    .then(data => {
+      window.handleNativeAiResponse(data.reply || 'No response generated.');
+    })
+    .catch(err => {
+      window.handleNativeAiResponse(`Notice: ${err.message}`);
+    });
 }
 
 // ==========================================
@@ -1879,6 +1919,19 @@ window.onload = function() {
   setLanguage(currentLang);
   renderPublicProducts();
   updateCartBadge();
+  initCloudStreamSync();
+  // Fetch initial cloud state
+  fetch('/api/state')
+    .then(r => r.json())
+    .then(data => {
+      if (data.products && data.products.length) products = data.products;
+      if (data.telecomOps && data.telecomOps.length) telecomOps = data.telecomOps;
+      if (data.scienceTasks && data.scienceTasks.length) scienceTasks = data.scienceTasks;
+      if (data.invoices && data.invoices.length) invoices = data.invoices;
+      renderPublicProducts();
+      renderScienceTasks();
+    })
+    .catch(() => {});
 };
 </script>
 </body>

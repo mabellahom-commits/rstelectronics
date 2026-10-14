@@ -1,0 +1,228 @@
+{
+  "themeConfig": {
+    "businessName": "RST ELECTRONICS",
+    "legalName": "AL WAHA AL KHDRA AL MUTAKAMILAH TRADING",
+    "crNo": "1374092",
+    "phone": "+968 9430 1393",
+    "email": "Eletrocnisrst@gmail.com",
+    "address": "Mabellah Sanaya, Road No 6, Muscat, Sultanate of Oman",
+    "currency": "OMR",
+    "vatRate": 5,
+    "decimalPlaces": 3,
+    "invoicePrefix": "RST"
+  },
+  "products": [
+    {
+      "id": 1,
+      "name": "iPhone 15 Pro Max 256GB",
+      "brand": "Apple",
+      "category": "Mobile",
+      "price": 479,
+      "cost": 410,
+      "stock": 12,
+      "barcode": "8901234567890",
+      "imei": "356789123456789",
+      "icon": "📱",
+      "featured": true
+    },
+    {
+      "id": 2,
+      "name": "Samsung Galaxy S24 Ultra 5G",
+      "brand": "Samsung",
+      "category": "Mobile",
+      "price": 429,
+      "cost": 365,
+      "stock": 9,
+      "barcode": "8901234567891",
+      "imei": "987654321123456",
+      "icon": "📱",
+      "featured": true
+    },
+    {
+      "id": 3,
+      "name": "Sony WH-1000XM5 ANC Headphones",
+      "brand": "Sony",
+      "category": "Audio",
+      "price": 134.9,
+      "cost": 105,
+      "stock": 18,
+      "barcode": "8901234567892",
+      "imei": "",
+      "icon": "🎧",
+      "featured": true
+    },
+    {
+      "id": 4,
+      "name": "Samsung 65\" Crystal UHD 4K Smart TV",
+      "brand": "Samsung",
+      "category": "TV",
+      "price": 225,
+      "cost": 175,
+      "stock": 6,
+      "barcode": "8901234567893",
+      "imei": "",
+      "icon": "📺",
+      "featured": true
+    },
+    {
+      "id": 5,
+      "name": "Xiaomi Redmi Note 13 Pro 5G",
+      "brand": "Xiaomi",
+      "category": "Mobile",
+      "price": 112.5,
+      "cost": 88,
+      "stock": 24,
+      "barcode": "8901234567894",
+      "imei": "864209753124680",
+      "icon": "📱",
+      "featured": true
+    },
+    {
+      "id": 6,
+      "name": "Apple MacBook Air 15\" M3 Chip",
+      "brand": "Apple",
+      "category": "Laptop",
+      "price": 565,
+      "cost": 485,
+      "stock": 5,
+      "barcode": "8901234567895",
+      "imei": "",
+      "icon": "💻",
+      "featured": true
+    }
+  ],
+  "telecomOps": [
+    {
+      "id": 1,
+      "name": "Omantel (Hayyak / Baqati)",
+      "code": "OMT",
+      "color": "#008542",
+      "balance": 450,
+      "margin": 2.5,
+      "type": "percent",
+      "latency": 18
+    },
+    {
+      "id": 2,
+      "name": "Ooredoo Oman (Shababiah)",
+      "code": "OOD",
+      "color": "#e11d48",
+      "balance": 320.5,
+      "margin": 0.055,
+      "type": "fixed",
+      "latency": 22
+    },
+    {
+      "id": 3,
+      "name": "Vodafone Oman (5G Red)",
+      "code": "VDF",
+      "color": "#dc2626",
+      "balance": 280,
+      "margin": 2.8,
+      "type": "percent",
+      "latency": 16
+    },
+    {
+      "id": 4,
+      "name": "Awasr Fiber High-Speed",
+      "code": "AWS",
+      "color": "#0284c7",
+      "balance": 500,
+      "margin": 3.5,
+      "type": "percent",
+      "latency": 9
+    },
+    {
+      "id": 5,
+      "name": "FRiENDi Mobile Oman",
+      "code": "FRD",
+      "color": "#7c3aed",
+      "balance": 150,
+      "margin": 0.04,
+      "type": "fixed",
+      "latency": 27
+    },
+    {
+      "id": 6,
+      "name": "Renna Mobile Oman",
+      "code": "RNN",
+      "color": "#ea580c",
+      "balance": 115,
+      "margin": 0.035,
+      "type": "fixed",
+      "latency": 29
+    }
+  ],
+  "utilityOps": [
+    {
+      "id": 1,
+      "name": "Nama Electricity Supply (ONEIC)",
+      "code": "ELEC",
+      "icon": "bolt",
+      "margin": 1.2
+    },
+    {
+      "id": 2,
+      "name": "Diam / Nama Water Services",
+      "code": "WATER",
+      "icon": "tint",
+      "margin": 1.2
+    },
+    {
+      "id": 3,
+      "name": "Omantel / Awasr Home Fiber Bill",
+      "code": "FIBER",
+      "icon": "wifi",
+      "margin": 2
+    }
+  ],
+  "scienceTasks": [
+    {
+      "id": 101,
+      "title": "Semiconductor Junction Thermal Drift Experiment",
+      "category": "Electronics & Physics",
+      "stage": "in_progress",
+      "priority": "High",
+      "dueDate": "2026-10-18",
+      "hypothesis": "Forward voltage drop decreases linearly at -2.1mV/°C as junction temperature rises from 25°C to 75°C.",
+      "independentVar": "Temperature (25°C - 75°C)",
+      "dependentVar": "Forward Voltage Vf (mV)",
+      "controlVar": "Constant current 10.0mA",
+      "apparatus": "DMM Keithley 2000, Temperature Chamber, K-Type Thermocouple",
+      "observations": "Confirmed -2.08mV/°C slope with R² = 0.998 across 5 trial runs.",
+      "updatedAt": "2026-10-14T04:38:45.279Z"
+    },
+    {
+      "id": 102,
+      "title": "5G NR Signal Attenuation Through Reinforced Concrete",
+      "category": "STEM Scientific Method",
+      "stage": "todo",
+      "priority": "Medium",
+      "dueDate": "2026-10-22",
+      "hypothesis": "3.5GHz mid-band signals suffer >24dB path loss compared to sub-1GHz Hayyak channels.",
+      "independentVar": "Carrier frequency & wall thickness",
+      "dependentVar": "RSSI & SINR",
+      "controlVar": "Transmitter distance 15m",
+      "apparatus": "SDR Analyzer, Spectrum Analyzer, Reference Horn Antenna",
+      "observations": "Apparatus calibrated in Mabellah showroom testing bay.",
+      "updatedAt": "2026-10-14T04:38:45.308Z"
+    },
+    {
+      "id": 103,
+      "title": "Li-Ion Battery Cell Degradation & Internal Resistance",
+      "category": "Chemical Solutions & Battery Testing",
+      "stage": "review",
+      "priority": "Urgent",
+      "dueDate": "2026-10-15",
+      "hypothesis": "AC impedance at 1kHz correlates directly with discharge cycle count.",
+      "independentVar": "Discharge cycle count (1 to 500)",
+      "dependentVar": "AC ESR (mΩ)",
+      "controlVar": "Room temp 23°C, 1C discharge rate",
+      "apparatus": "Battery Impedance Meter, Electronic Load",
+      "observations": "ESR increased from 18mΩ to 44mΩ after 400 cycles.",
+      "updatedAt": "2026-10-14T04:38:45.308Z"
+    }
+  ],
+  "invoices": [],
+  "updatedAt": "2026-10-14T04:38:45.308Z"
+}
