@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isValidTask(data, userId) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 128
+        && data.userId == userId
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 300
+        && (!('description' in data) || data.description is string && data.description.size() <= 5000)
+        && data.status in ['TODO', 'IN_PROGRESS', 'REVIEW', 'COMPLETED']
+        && data.priority in ['LOW', 'MEDIUM', 'HIGH', 'URGENT']
+        && data.category in ['BIOLOGY', 'CHEMISTRY', 'PHYSICS', 'DATA_SCIENCE', 'GENERAL_LAB']
+        && data.scienceSkill in ['HYPOTHESIS', 'EXPERIMENT_DESIGN', 'DATA_COLLECTION', 'ANALYSIS_CONCLUSION', 'LAB_SAFETY']
+        && data.isCompleted is bool
+        && (!('dueDate' in data) || data.dueDate is string)
+        && (!('hypothesis' in data) || data.hypothesis is string)
+        && (!('independentVariable' in data) || data.independentVariable is string)
+        && (!('dependentVariable' in data) || data.dependentVariable is string)
+        && (!('experimentId' in data) || data.experimentId is string)
+        && (!('createdAt' in data) || data.createdAt is timestamp && data.createdAt <= request.time)
+        && (!('updatedAt' in data) || data.updatedAt is timestamp && data.updatedAt <= request.time);
+    }
+
+    function isValidExperiment(data, userId) {
+      return data.id is string && data.id.size() > 0 && data.id.size() <= 128
+        && data.userId == userId
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 300
+        && data.researchQuestion is string && data.researchQuestion.size() > 0 && data.researchQuestion.size() <= 1000
+        && data.hypothesis is string && data.hypothesis.size() > 0 && data.hypothesis.size() <= 1000
+        && (!('methodology' in data) || data.methodology is string && data.methodology.size() <= 5000)
+        && data.status in ['PLANNING', 'IN_PROGRESS', 'ANALYZING', 'CONCLUDED']
+        && (!('safetyNotes' in data) || data.safetyNotes is string && data.safetyNotes.size() <= 2000)
+        && (!('createdAt' in data) || data.createdAt is timestamp && data.createdAt <= request.time)
+        && (!('updatedAt' in data) || data.updatedAt is timestamp && data.updatedAt <= request.time);
+    }
+
+    match /users/{userId}/tasks/{taskId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidTask(request.resource.data, userId);
+      allow update: if isOwner(userId) && isValidTask(request.resource.data, userId);
+      allow delete: if isOwner(userId);
+    }
+
+    match /users/{userId}/experiments/{experimentId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isValidExperiment(request.resource.data, userId);
+      allow update: if isOwner(userId) && isValidExperiment(request.resource.data, userId);
+      allow delete: if isOwner(userId);
+    }
+  }
+}

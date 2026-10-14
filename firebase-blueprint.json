@@ -1,0 +1,76 @@
+{
+  "entities": {
+    "Task": {
+      "title": "Task",
+      "description": "Scientific task or experiment milestone with real-time sync across devices.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique task identifier" },
+        "userId": { "type": "string", "description": "Owner Google User ID" },
+        "title": { "type": "string", "description": "Task or experiment title" },
+        "description": { "type": "string", "description": "Details of the scientific task" },
+        "status": {
+          "type": "string",
+          "enum": ["TODO", "IN_PROGRESS", "REVIEW", "COMPLETED"],
+          "description": "Workflow execution status"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["LOW", "MEDIUM", "HIGH", "URGENT"],
+          "description": "Scientific priority level"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["BIOLOGY", "CHEMISTRY", "PHYSICS", "DATA_SCIENCE", "GENERAL_LAB"],
+          "description": "Scientific discipline category"
+        },
+        "scienceSkill": {
+          "type": "string",
+          "enum": ["HYPOTHESIS", "EXPERIMENT_DESIGN", "DATA_COLLECTION", "ANALYSIS_CONCLUSION", "LAB_SAFETY"],
+          "description": "Primary scientific inquiry skill applied"
+        },
+        "dueDate": { "type": "string", "description": "Target completion date" },
+        "isCompleted": { "type": "boolean", "description": "Whether the task has been marked finished" },
+        "hypothesis": { "type": "string", "description": "Testable scientific hypothesis" },
+        "independentVariable": { "type": "string", "description": "Independent experimental variable" },
+        "dependentVariable": { "type": "string", "description": "Dependent experimental variable" },
+        "experimentId": { "type": "string", "description": "Optional parent experiment link" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp" }
+      },
+      "required": ["id", "userId", "title", "status", "priority", "category", "scienceSkill", "isCompleted"]
+    },
+    "Experiment": {
+      "title": "Experiment",
+      "description": "Scientific lab experiment project encompassing hypotheses, protocols, and data logs.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique experiment identifier" },
+        "userId": { "type": "string", "description": "Owner Google User ID" },
+        "title": { "type": "string", "description": "Experiment title" },
+        "researchQuestion": { "type": "string", "description": "Core scientific inquiry question" },
+        "hypothesis": { "type": "string", "description": "Hypothesis statement" },
+        "methodology": { "type": "string", "description": "Experimental protocol and methods" },
+        "status": {
+          "type": "string",
+          "enum": ["PLANNING", "IN_PROGRESS", "ANALYZING", "CONCLUDED"],
+          "description": "Current state in the scientific method"
+        },
+        "safetyNotes": { "type": "string", "description": "Lab safety hazards, PPE, and mitigation" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server update timestamp" }
+      },
+      "required": ["id", "userId", "title", "researchQuestion", "hypothesis", "status"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/Task" },
+      "description": "Collection of scientific tasks partitioned per authenticated user."
+    },
+    "/users/{userId}/experiments/{experimentId}": {
+      "schema": { "$ref": "#/entities/Experiment" },
+      "description": "Collection of scientific experiments partitioned per authenticated user."
+    }
+  }
+}

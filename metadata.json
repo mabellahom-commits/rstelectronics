@@ -1,0 +1,6 @@
+{
+  "name": "RST Electronics",
+  "description": "Multi-language (English, Bengali, Arabic) Web ERP, E-commerce Shop & Scientific Task Management with Oman Telecom POS, Video Analysis, and Gemini AI Reasoning.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
